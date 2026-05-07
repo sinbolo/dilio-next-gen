@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Sequence Player - Dilio</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+
+        #container {
+            position: relative;
+            width: 100%;
+            max-width: 1280px;
+            aspect-ratio: 16/9; /* Ajustar según el video */
+            background: #000;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        #preloader {
+            position: absolute;
+            inset: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            color: #fff;
+            transition: opacity 0.5s ease;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #fff;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <div id="preloader">
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <div class="label">Cargando frames... <span id="percent">0%</span></div>
+        </div>
+        <canvas id="player"></canvas>
+    </div>
+
+    <script>
+        const config = {
+            frameCount: 139, // Total de frames generados
+            basePath: 'frames_bio/frame_',
+            extension: '.jpg',
+            fps: 30
+        };
+
+        const canvas = document.getElementById('player');
+        const ctx = canvas.getContext('2d');
+        const preloader = document.getElementById('preloader');
+        const progressFill = document.getElementById('progress-fill');
+        const percentText = document.getElementById('percent');
+
+        let images = [];
+        let loadedCount = 0;
+        let currentFrame = 0;
+        let lastTime = 0;
+
+        function preload() {
+            for (let i = 1; i <= config.frameCount; i++) {
+                const img = new Image();
+                const frameNum = i.toString().padStart(4, '0');
+                img.src = `${config.basePath}${frameNum}${config.extension}`;
+                
+                img.onload = () => {
+                    loadedCount++;
+                    const progress = (loadedCount / config.frameCount) * 100;
+                    progressFill.style.width = `${progress}%`;
+                    percentText.innerText = `${Math.round(progress)}%`;
+
+                    if (loadedCount === config.frameCount) {
+                        startAnimation();
+                    }
+                };
+
+                img.onerror = () => {
+                    console.error("Error cargando frame:", img.src);
+                    loadedCount++; // Seguimos para no bloquear el loop
+                };
+
+                images.push(img);
+            }
+        }
+
+        function startAnimation() {
+            preloader.style.opacity = '0';
+            setTimeout(() => preloader.style.display = 'none', 500);
+            requestAnimationFrame(animate);
+        }
+
+        function animate(time) {
+            const interval = 1000 / config.fps;
+            const delta = time - lastTime;
+
+            if (delta > interval) {
+                lastTime = time - (delta % interval);
+                
+                const img = images[currentFrame];
+                if (img && img.complete) {
+                    if (canvas.width !== img.naturalWidth) {
+                        canvas.width = img.naturalWidth;
+                        canvas.height = img.naturalHeight;
+                    }
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                    currentFrame = (currentFrame + 1) % config.frameCount;
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        preload();
+    </script>
+</body>
+</html>

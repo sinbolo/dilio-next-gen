@@ -1,0 +1,140 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+:root {
+  /* Colors - Design System */
+  --surface: #f9f9f9;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f2f2f2;
+  --surface-container: #eeeeee;
+  --surface-container-highest: #e2e2e2;
+  --primary: #000000;
+  --on-primary: #e2e2e2;
+  --outline-variant: #c6c6c6;
+
+  /* Font Mappings - Linking Next.js fonts to our design system */
+  --font-display: var(--font-space-grotesk);
+  --font-body: var(--font-manrope);
+  --font-sketch: var(--font-architects);
+  --font-handwriting: var(--font-marker);
+  --sketch-green: #3dffb8;
+}
+
+.font-sketch { font-family: var(--font-sketch), cursive; }
+.font-handwriting { font-family: var(--font-handwriting), cursive; }
+.text-sketch-green { color: var(--sketch-green); }
+
+* {
+  border-radius: 0 !important; /* The "No-Line" Rule */
+}
+
+/* Exception for circular elements */
+.rounded-full, 
+[class*="rounded-full"] {
+  border-radius: 9999px !important;
+}
+
+body {
+  background-color: var(--surface);
+  color: var(--primary);
+  font-family: var(--font-body), sans-serif;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* Typography */
+h1, h2, h3, h4, .display-lg, .display-md, .display-sm, .display-xs {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+}
+.display-lg { font-size: clamp(3rem, 8vw, 6rem); line-height: 0.9; }
+.display-md { font-size: clamp(2rem, 5vw, 4rem); line-height: 1; }
+.display-sm { font-size: 2rem; line-height: 1.1; }
+.display-xs { font-size: 1.5rem; line-height: 1.2; }
+.body-md { font-size: 1rem; color: #555; line-height: 1.6; }
+.label-md { font-size: 0.875rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; }
+.label-xs { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; }
+
+/* Custom utilities */
+.glassmorphism {
+  background: rgba(249, 249, 249, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.no-box-input {
+  background: transparent;
+  border: none !important;
+  border-bottom: 1px solid rgba(198, 198, 198, 0.2) !important; /* outline_variant at 20% */
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.no-box-input:focus {
+  border-bottom: 2px solid var(--primary) !important;
+}
+
+.no-box-input.error {
+  border-bottom: 1px solid #ef4444 !important; /* text-red-500 */
+}
+
+.no-box-input.error:focus {
+  border-bottom: 2px solid #ef4444 !important;
+}
+
+.ghost-border {
+  border: 1px solid rgba(198, 198, 198, 0.15) !important;
+}
+
+.ambient-shadow {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+}
+
+@keyframes veil-float {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(1px, -1.5px) rotate(0.05deg); }
+  66% { transform: translate(-1px, 1px) rotate(-0.05deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+
+
+
+
+@keyframes flashlight-pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+.animate-veil-float {
+  animation: veil-float 15s ease-in-out infinite;
+}
+
+.animate-flashlight-pulse {
+  animation: flashlight-pulse 4s ease-in-out infinite;
+}
+
+/* Custom Scrollbar for inner components */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+
+/* Hide Next.js development indicator as requested */
+[data-nextjs-static-indicator] {
+  display: none !important;
+}
