@@ -6,6 +6,7 @@ import { ClientHeader } from "@/components/ui/ClientHeader";
 import { Providers } from "./providers";
 import { CartDrawer } from "@/components/ui/CartDrawer";
 import { SocialLinks } from "@/components/ui/SocialLinks";
+import { NewsletterForm } from "@/components/ui/NewsletterForm";
 import Script from "next/script";
 
 const spaceGrotesk = Space_Grotesk({ 
@@ -61,21 +62,26 @@ export default function RootLayout({
 
           {children}
 
+
           {/* Footer */}
-          <footer id="section-social" className="bg-surface py-12 border-t border-primary/10">
-            <div className="max-w-[800px] mx-auto px-10 flex flex-col md:flex-row justify-between items-center gap-6">
-
-              <div className="flex gap-8">
-                <a href="/legal/privacy" className="label-xs text-[#888] hover:text-primary transition-colors">PRIVACY</a>
-                <a href="/legal/terms" className="label-xs text-[#888] hover:text-primary transition-colors">TERMS</a>
-              </div>
+          <footer id="section-social" className="bg-surface py-20 border-t border-primary/10">
+            <div className="max-w-[800px] mx-auto px-10 flex flex-col items-center gap-12">
               
-              <div className="flex gap-6 items-center">
-                <SocialLinks />
-              </div>
+              <NewsletterForm />
 
-              <div>
-                 <span className="label-xs text-[#888]">© 2026 DILIO. ALL RIGHTS RESERVED.</span>
+              <div className="w-full flex flex-col md:flex-row justify-between items-center gap-6 pt-12 border-t border-primary/5">
+                <div className="flex gap-8">
+                  <a href="/legal/privacy" className="label-xs text-[#888] hover:text-primary transition-colors">PRIVACY</a>
+                  <a href="/legal/terms" className="label-xs text-[#888] hover:text-primary transition-colors">TERMS</a>
+                </div>
+                
+                <div className="flex gap-6 items-center">
+                  <SocialLinks />
+                </div>
+
+                <div>
+                   <span className="label-xs text-[#888]">© 2026 DILIO. ALL RIGHTS RESERVED.</span>
+                </div>
               </div>
             </div>
           </footer>

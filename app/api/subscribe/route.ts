@@ -1,40 +1,38 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { rateLimit } from '@/lib/rate-limit';
-import { getBookingEmailHtml } from '@/lib/email-templates';
+import { getWelcomeEmailHtml } from '@/lib/email-templates';
 
 const limiter = rateLimit({
   interval: 60 * 1000, 
   uniqueTokenPerInterval: 500,
 });
 
-const contactSchema = z.object({
+const subscribeSchema = z.object({
   email: z.string().email(),
-  message: z.string().min(10).max(500),
 });
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const LOGO_URL = "https://www.dilio.es/assets/logo_bio_off_clean.png";
-const DESTINATION_EMAIL = "alejandromendez.oj@gmail.com"; // Updated based on bio name
 
 export async function POST(req: Request) {
   try {
     const ip = req.headers.get('x-forwarded-for') || 'anonymous';
     try {
-      await limiter.check(3, ip);
+      await limiter.check(5, ip); // 5 attempts per minute
     } catch {
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
 
     const body = await req.json();
-    const validatedData = contactSchema.parse(body);
+    const validatedData = subscribeSchema.parse(body);
 
     if (!RESEND_API_KEY) {
       console.error("RESEND_API_KEY is missing");
       return NextResponse.json({ success: true, message: "Mock success (API Key missing)" }, { status: 200 });
     }
 
-    // Send email to Alejandro (Booking Notification)
+    // Send welcome email to the Fan
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -42,25 +40,25 @@ export async function POST(req: Request) {
         'Authorization': `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'DILIO Booking <onboarding@resend.dev>', // This will need domain verification later
-        to: DESTINATION_EMAIL,
-        subject: `NEW BOOKING INQUIRY: ${validatedData.email}`,
-        html: getBookingEmailHtml(LOGO_URL, validatedData),
+        from: 'DILIO <onboarding@resend.dev>',
+        to: validatedData.email,
+        subject: 'Bienvenido a DILIO',
+        html: getWelcomeEmailHtml(LOGO_URL),
       }),
     });
 
     if (!res.ok) {
       const error = await res.json();
       console.error("Resend error:", error);
-      throw new Error("Failed to send email via Resend");
+      throw new Error("Failed to send welcome email");
     }
 
     return NextResponse.json({ success: true }, { status: 200 });
 
   } catch (error) {
-    console.error("Contact API Error:", error);
+    console.error("Subscribe API Error:", error);
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validation failed', details: error.errors }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
     }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
