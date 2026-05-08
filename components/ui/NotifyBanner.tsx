@@ -18,18 +18,27 @@ export function NotifyBanner({ isOpen, onClose, city }: NotifyBannerProps) {
     e.preventDefault();
     setStatus("submitting");
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setStatus("success");
-    setEmail("");
-    
-    // Auto close after 3 seconds on success
-    setTimeout(() => {
-      onClose();
-      // Reset status for next time
-      setTimeout(() => setStatus("idle"), 500);
-    }, 3000);
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, city }),
+      });
+
+      if (!res.ok) throw new Error("Failed to subscribe");
+      
+      setStatus("success");
+      setEmail("");
+      
+      // Auto close after 3 seconds on success
+      setTimeout(() => {
+        onClose();
+        setTimeout(() => setStatus("idle"), 500);
+      }, 3000);
+    } catch (err) {
+      console.error("Subscription error:", err);
+      setStatus("idle");
+    }
   };
 
   return (
