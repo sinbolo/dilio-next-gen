@@ -44,6 +44,10 @@ export const metadata: Metadata = {
   description: "Digital Curation. An exploration of sound and light.",
 };
 
+export const viewport: import("next").Viewport = {
+  themeColor: "#ffffff",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

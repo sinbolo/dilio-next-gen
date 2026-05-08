@@ -36,11 +36,22 @@
 }
 
 body {
-  background-color: var(--surface);
+  background-color: #ffffff;
   color: var(--primary);
   font-family: var(--font-body), sans-serif;
   line-height: 1.5;
   overflow-x: hidden;
+  /* Fix visual artifacts on mobile rendering */
+  image-rendering: -webkit-optimize-contrast;
+  color-interpolation-filters: sRGB;
+}
+
+/* GPU Stabilization for complex composite layers */
+.gpu-stabilize {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
 }
 
 /* Typography */

@@ -88,7 +88,7 @@ export function BioSection() {
               {/* Base Image (Off) - Always visible initially */}
               <motion.img 
                 src="/assets/logo_bio_off_clean.png"
-                className="h-full w-auto object-contain mix-blend-multiply relative left-2 md:left-0 brightness-125 contrast-[2] saturate-0"
+                className="h-full w-auto object-contain mix-blend-multiply relative left-2 md:left-0 brightness-125 contrast-[2] saturate-0 gpu-stabilize"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
@@ -96,7 +96,7 @@ export function BioSection() {
               
               {/* Active Image (On) - Infinite Loop: 4s ON / ~3.5s OFF */}
               <motion.div 
-                className="absolute inset-0"
+                className="absolute inset-0 gpu-stabilize"
                 animate={{ 
                   opacity: [
                     0, 0, 1, 0, 1, 0.3, 1, // Power On Flicker (0.5s)
