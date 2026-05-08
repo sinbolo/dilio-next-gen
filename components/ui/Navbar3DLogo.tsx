@@ -35,22 +35,22 @@ export const Navbar3DLogo: React.FC<{ onClick?: () => void }> = ({ onClick }) =>
       const imageData = octx.getImageData(0, 0, offscreen.width, offscreen.height);
       const d = imageData.data;
       
-      // High-Fidelity Luminance Masking: Maps brightness to alpha for cinematic transparency
+      // Invert Colors & Enhance for Dark Background integration
       for (let i = 0; i < d.length; i += 4) {
-        const r = d[i], g = d[i+1], b = d[i+2];
-        const brightness = (r + g + b) / 3;
-        
-        // Background is light gray (~238), Logo is dark (~40)
-        // We want Alpha to be 0 for brightness 238+ and 255 for brightness 40-
-        // Using a smooth quintic falloff for premium edges
-        const t = Math.max(0, Math.min(1, (242 - brightness) / 180));
-        d[i + 3] = Math.round(Math.pow(t, 1.5) * 255);
-        
-        // Optional: Enhance the green reflections slightly for a premium feel
-        if (g > r && g > b) {
-           d[i] *= 0.9;
-           d[i+2] *= 0.9;
-           d[i+1] *= 1.1;
+        // Invert: (255 - original)
+        // This turns the light gray background into dark gray/black
+        // and the dark letters into light/white letters
+        d[i] = 255 - d[i];
+        d[i+1] = 255 - d[i+1];
+        d[i+2] = 255 - d[i+2];
+
+        // Soften the new dark background to ensure it's absolute black where it was light gray
+        const brightness = (d[i] + d[i+1] + d[i+2]) / 3;
+        if (brightness < 45) { // If it's the inverted light-gray background
+           d[i] = 0;
+           d[i+1] = 0;
+           d[i+2] = 0;
+           d[i+3] = 0; // Pure transparency for the background area
         }
       }
       

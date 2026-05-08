@@ -109,16 +109,15 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const d = imageData.data;
           for (let i = 0; i < d.length; i += 4) {
-            const r = d[i], g = d[i+1], b = d[i+2];
-            const brightness = (r + g + b) / 3;
-            
-            // Premium Luminance Masking for the large logo
-            const t = Math.max(0, Math.min(1, (240 - brightness) / 185));
-            d[i + 3] = Math.round(Math.pow(t, 1.3) * 255);
+            // Invert colors to make the logo light on a dark background
+            d[i] = 255 - d[i];
+            d[i+1] = 255 - d[i+1];
+            d[i+2] = 255 - d[i+2];
 
-            // Boost the brand green reflections
-            if (g > r && g > b) {
-              d[i+1] = Math.min(255, d[i+1] * 1.15);
+            const brightness = (d[i] + d[i+1] + d[i+2]) / 3;
+            // Clear the new dark background
+            if (brightness < 45) {
+              d[i+3] = 0;
             }
           }
           ctx.putImageData(imageData, 0, 0);
