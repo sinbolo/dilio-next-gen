@@ -111,8 +111,14 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
           for (let i = 0; i < d.length; i += 4) {
             const r = d[i], g = d[i+1], b = d[i+2];
             const brightness = (r + g + b) / 3;
-            if (brightness > 215) {
-              d[i + 3] = Math.max(0, (255 - brightness) / 40 * 255);
+            
+            // Premium Luminance Masking for the large logo
+            const t = Math.max(0, Math.min(1, (240 - brightness) / 185));
+            d[i + 3] = Math.round(Math.pow(t, 1.3) * 255);
+
+            // Boost the brand green reflections
+            if (g > r && g > b) {
+              d[i+1] = Math.min(255, d[i+1] * 1.15);
             }
           }
           ctx.putImageData(imageData, 0, 0);
@@ -152,7 +158,7 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
           style={{ 
             opacity: framesLoaded ? 1 : 0, 
             transition: 'opacity 0.6s ease-in-out',
-            filter: 'contrast(1.1) brightness(1.05)'
+            filter: 'contrast(1.15) brightness(1.1) drop-shadow(0 0 30px rgba(0,0,0,0.5))'
           }}
         />
       </div>

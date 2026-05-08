@@ -35,12 +35,22 @@ export const Navbar3DLogo: React.FC<{ onClick?: () => void }> = ({ onClick }) =>
       const imageData = octx.getImageData(0, 0, offscreen.width, offscreen.height);
       const d = imageData.data;
       
-      // Remove white/gray background (#eeeeee area)
+      // High-Fidelity Luminance Masking: Maps brightness to alpha for cinematic transparency
       for (let i = 0; i < d.length; i += 4) {
         const r = d[i], g = d[i+1], b = d[i+2];
         const brightness = (r + g + b) / 3;
-        if (brightness > 210) {
-          d[i + 3] = Math.max(0, (250 - brightness) / 40 * 255);
+        
+        // Background is light gray (~238), Logo is dark (~40)
+        // We want Alpha to be 0 for brightness 238+ and 255 for brightness 40-
+        // Using a smooth quintic falloff for premium edges
+        const t = Math.max(0, Math.min(1, (242 - brightness) / 180));
+        d[i + 3] = Math.round(Math.pow(t, 1.5) * 255);
+        
+        // Optional: Enhance the green reflections slightly for a premium feel
+        if (g > r && g > b) {
+           d[i] *= 0.9;
+           d[i+2] *= 0.9;
+           d[i+1] *= 1.1;
         }
       }
       
