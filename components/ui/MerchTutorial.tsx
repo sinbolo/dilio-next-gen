@@ -212,7 +212,7 @@ export function MerchTutorial() {
             <div className={`relative w-full h-full max-w-[1400px] mx-auto ${isMobile ? 'px-6' : 'px-10'}`}>
               
               {/* Message Block 1: Flashlight Instruction */}
-              <div className={`absolute ${isMobile ? 'top-[25%] left-1/2 -translate-x-1/2 items-center text-center w-[90%]' : 'top-[20%] left-[15%] md:left-[10%] items-start'} flex flex-col`}>
+              <div className={`absolute ${isMobile ? 'top-[18%] left-1/2 -translate-x-1/2 items-center text-center w-[90%]' : 'top-[20%] left-[15%] md:left-[10%] items-start'} flex flex-col`}>
                 <motion.div
                   initial={{ opacity: 0, filter: "blur(20px)", y: 20 }}
                   animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
@@ -223,7 +223,10 @@ export function MerchTutorial() {
                   <div className={`relative z-10 font-sketch ${isMobile ? 'text-[12px]' : 'text-[8px] md:text-sm'} uppercase tracking-widest italic`} style={fireTextStyle}>
                     <AnimatePresence mode="wait">
                       <motion.div key={lang} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                        {lang === 'en' ? "Reveal the invisible with light." : "Usa la luz para revelar lo invisible."}
+                        {isMobile 
+                          ? (lang === 'en' ? "Touch and move to reveal." : "Toca y desliza para revelar.")
+                          : (lang === 'en' ? "Reveal the invisible with light." : "Usa la luz para revelar lo invisible.")
+                        }
                       </motion.div>
                     </AnimatePresence>
                     
@@ -236,7 +239,7 @@ export function MerchTutorial() {
               </div>
 
               {/* Message Block 2: Exploration Hint */}
-              <div className={`absolute ${isMobile ? 'bottom-[35%] left-1/2 -translate-x-1/2 items-center text-center w-[90%]' : 'bottom-[25%] right-[12%] items-end'} flex flex-col`}>
+              <div className={`absolute ${isMobile ? 'bottom-[22%] left-1/2 -translate-x-1/2 items-center text-center w-[90%]' : 'bottom-[25%] right-[12%] items-end'} flex flex-col`}>
                 <motion.div
                   initial={{ opacity: 0, filter: "blur(20px)", y: 20 }}
                   animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
