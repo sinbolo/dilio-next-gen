@@ -15,7 +15,7 @@ const contactSchema = z.object({
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const LOGO_URL = "https://www.dilio.es/assets/logo_bio_off_clean.png";
-const DESTINATION_EMAIL = "alejandromendez.oj@gmail.com"; // Updated based on bio name
+const DESTINATION_EMAIL = "booking@dilio.es";
 
 export async function POST(req: Request) {
   try {
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
         'Authorization': `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'DILIO Booking <onboarding@resend.dev>', // This will need domain verification later
+        from: 'DILIO Booking <onboarding@resend.dev>',
         to: DESTINATION_EMAIL,
         subject: `NEW BOOKING INQUIRY: ${validatedData.email}`,
         html: getBookingEmailHtml(LOGO_URL, validatedData),
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     if (!res.ok) {
       const error = await res.json();
       console.error("Resend error:", error);
-      throw new Error("Failed to send email via Resend");
+      throw new Error("Failed to send booking email");
     }
 
     return NextResponse.json({ success: true }, { status: 200 });

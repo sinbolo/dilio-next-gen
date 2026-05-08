@@ -14,6 +14,7 @@ const subscribeSchema = z.object({
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const LOGO_URL = "https://www.dilio.es/assets/logo_bio_off_clean.png";
+const NOTIFY_ADMIN_EMAIL = "realdiliomusic@gmail.com";
 
 export async function POST(req: Request) {
   try {
@@ -52,6 +53,21 @@ export async function POST(req: Request) {
       console.error("Resend error:", error);
       throw new Error("Failed to send welcome email");
     }
+
+    // Notify Admin about new subscriber
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'DILIO System <onboarding@resend.dev>',
+        to: NOTIFY_ADMIN_EMAIL,
+        subject: 'NUEVO SUSCRIPTOR EN DILIO.ES',
+        html: `<p>Nuevo fan suscrito: <b>${validatedData.email}</b></p>`,
+      }),
+    });
 
     return NextResponse.json({ success: true }, { status: 200 });
 
