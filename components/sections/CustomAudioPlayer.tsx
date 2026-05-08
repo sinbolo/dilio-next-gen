@@ -59,10 +59,9 @@ export function CustomAudioPlayer() {
   useEffect(() => {
     if (!mounted) return;
 
-    const script = document.createElement("script");
-    script.src = "https://w.soundcloud.com/player/api.js";
-    script.async = true;
-    script.onload = () => {
+    let checkInterval: NodeJS.Timeout;
+
+    const initWidget = () => {
       if (iframeRef.current && window.SC) {
         widgetRef.current = window.SC.Widget(iframeRef.current);
         const widget = widgetRef.current;
@@ -84,14 +83,30 @@ export function CustomAudioPlayer() {
           const millis = Math.floor((ms % 1000));
           setCurrentTime(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${millis.toString().padStart(3, '0')}`);
         });
+        
+        if (checkInterval) clearInterval(checkInterval);
       }
     };
-    document.body.appendChild(script);
+
+    // Check if SC is already available from layout.tsx Script
+    if (window.SC) {
+      initWidget();
+    } else {
+      // Poll until SC is available (max 10 seconds)
+      let attempts = 0;
+      checkInterval = setInterval(() => {
+        attempts++;
+        if (window.SC) {
+          initWidget();
+          clearInterval(checkInterval);
+        } else if (attempts > 20) {
+          clearInterval(checkInterval);
+        }
+      }, 500);
+    }
 
     return () => {
-      if (script.parentNode) {
-        document.body.removeChild(script);
-      }
+      if (checkInterval) clearInterval(checkInterval);
     };
   }, [mounted]);
 
@@ -147,7 +162,16 @@ export function CustomAudioPlayer() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const render = () => {
+    let lastFrameTime = 0;
+    const fpsInterval = isMobile ? 1000 / 30 : 1000 / 60; // 30 FPS on mobile, 60 on desktop
+
+    const render = (timestamp: number) => {
+      if (timestamp - lastFrameTime < fpsInterval) {
+        animationRef.current = requestAnimationFrame(render);
+        return;
+      }
+      lastFrameTime = timestamp;
+
       const w = canvas.width;
       const h = canvas.height;
       const centerY = h / 2;
@@ -211,12 +235,12 @@ export function CustomAudioPlayer() {
       animationRef.current = requestAnimationFrame(render);
     };
 
-    render();
+    animationRef.current = requestAnimationFrame(render);
 
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [isPlaying]);
+  }, [isPlaying, isMobile]);
 
   if (!mounted) return null;
 
