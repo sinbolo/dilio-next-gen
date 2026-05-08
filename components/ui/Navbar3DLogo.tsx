@@ -24,11 +24,28 @@ export const Navbar3DLogo: React.FC<{ onClick?: () => void }> = ({ onClick }) =>
 
   const processImage = useCallback((img: HTMLImageElement, index: number) => {
     if (processedFramesRef.current.has(index)) return;
+
+    const offscreen = document.createElement('canvas');
+    offscreen.width = 400;
+    offscreen.height = 150;
+    const octx = offscreen.getContext('2d', { willReadFrequently: true });
     
-    // No longer pre-processing background in JS. 
-    // We will use CSS mix-blend-multiply for a much lighter experience.
-    processedFramesRef.current.set(index, img as any);
-    if (index === 1) setFirstFrameReady(true);
+    if (octx && img.complete && img.naturalWidth > 0) {
+      octx.drawImage(img, 0, 0, offscreen.width, offscreen.height);
+      const imageData = octx.getImageData(0, 0, offscreen.width, offscreen.height);
+      const d = imageData.data;
+      
+      // Remove white background
+      for (let i = 0; i < d.length; i += 4) {
+        const brightness = (d[i] + d[i + 1] + d[i + 2]) / 3;
+        if (brightness > 235) d[i + 3] = 0;
+        else if (brightness > 220) d[i + 3] = ((235 - brightness) / 15) * 255;
+      }
+      
+      octx.putImageData(imageData, 0, 0);
+      processedFramesRef.current.set(index, offscreen);
+      if (index === 1) setFirstFrameReady(true);
+    }
   }, []);
 
   // Preload and pre-process all images immediately
@@ -113,11 +130,11 @@ export const Navbar3DLogo: React.FC<{ onClick?: () => void }> = ({ onClick }) =>
         ref={canvasRef}
         width={400}
         height={150}
-        className="w-full h-full object-contain mix-blend-multiply"
+        className="w-full h-full object-contain"
         style={{ 
           opacity: firstFrameReady ? 1 : 0, 
           transition: 'opacity 0.3s ease-in-out',
-          willChange: 'transform'
+          willChange: 'transform' // Changed from contents to transform for better GPU optimization
         }}
       />
     </div>

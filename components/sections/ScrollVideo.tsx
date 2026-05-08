@@ -69,37 +69,47 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
     return () => observer.disconnect();
   }, []);
 
-  // Handle frame changes via MotionValue event for better performance
   useEffect(() => {
     if (!framesLoaded || !isInView) return;
+    let rafId: number;
 
-    const render = (latest: number) => {
-      const current = Math.round(latest);
+    const render = () => {
       const imgs = imagesRef.current;
-      const canvas = canvasRef.current;
-      
-      if (current === lastIndexRef.current) return;
+      let current = Math.round(frameIndex.get());
+      current = Math.max(1, Math.min(totalFrames, current));
+
+      // SKIP processing if we already rendered this frame
+      if (current === lastIndexRef.current) {
+        rafId = requestAnimationFrame(render);
+        return;
+      }
       lastIndexRef.current = current;
 
       const img = imgs[current - 1];
+      const canvas = canvasRef.current;
       if (canvas && img?.complete && img.naturalWidth > 0) {
-        const ctx = canvas.getContext('2d', { alpha: true });
+        const ctx = canvas.getContext('2d', { willReadFrequently: false });
         if (ctx) {
           if (canvas.width !== img.naturalWidth) {
             canvas.width = img.naturalWidth;
             canvas.height = img.naturalHeight;
           }
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, -10, canvas.width, canvas.height + 10);
+          try {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const d = imageData.data;
+            for (let i = 0; i < d.length; i += 4) {
+              if (d[i] > 230 && d[i + 1] > 230 && d[i + 2] > 230) d[i + 3] = 0;
+            }
+            ctx.putImageData(imageData, 0, 0);
+          } catch { /* ignore cross-origin */ }
         }
       }
+      rafId = requestAnimationFrame(render);
     };
 
-    // Initial render
-    render(frameIndex.get());
-
-    const unsubscribe = frameIndex.on("change", render);
-    return () => unsubscribe();
+    rafId = requestAnimationFrame(render);
+    return () => cancelAnimationFrame(rafId);
   }, [framesLoaded, frameIndex, totalFrames, isInView]);
 
   return (
@@ -107,7 +117,7 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
       <div className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden bg-white">
         <canvas
           ref={canvasRef}
-          className="w-[85vw] h-[85vh] md:w-[65vw] md:h-[65vh] object-contain -translate-y-8 md:translate-y-0 mix-blend-multiply"
+          className="w-[85vw] h-[85vh] md:w-[65vw] md:h-[65vh] object-contain -translate-y-8 md:translate-y-0"
           style={{ opacity: framesLoaded ? 1 : 0, transition: 'opacity 0.6s ease-in-out' }}
         />
         {/* Small non-blocking loader indicator — NOT fullscreen */}
