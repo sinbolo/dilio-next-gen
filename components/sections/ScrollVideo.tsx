@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { useScroll, useTransform, useSpring } from 'framer-motion';
 
 interface ScrollVideoProps {
@@ -102,15 +103,8 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
             canvas.width = img.naturalWidth;
             canvas.height = img.naturalHeight;
           }
-          ctx.drawImage(img, 0, -10, canvas.width, canvas.height + 10);
-          try {
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const d = imageData.data;
-            for (let i = 0; i < d.length; i += 4) {
-              if (d[i] > 230 && d[i + 1] > 230 && d[i + 2] > 230) d[i + 3] = 0;
-            }
-            ctx.putImageData(imageData, 0, 0);
-          } catch { /* ignore cross-origin */ }
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         }
       }
       rafId = requestAnimationFrame(render);
@@ -123,17 +117,25 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
   return (
     <div ref={containerRef} className="relative w-full h-[200vh]">
       <div className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden bg-white">
-        <canvas
-          ref={canvasRef}
-          className="w-[85vw] h-[85vh] md:w-[65vw] md:h-[65vh] object-contain -translate-y-8 md:translate-y-0"
-          style={{ opacity: framesLoaded ? 1 : 0, transition: 'opacity 0.6s ease-in-out' }}
-        />
-        {/* Small non-blocking loader indicator — NOT fullscreen */}
+        {/* Instant Placeholder Image */}
         {!framesLoaded && (
-          <div className="absolute inset-0 flex items-end justify-center pb-16 pointer-events-none">
-            <div className="w-4 h-4 border-2 border-black/20 border-t-black/50 rounded-full animate-spin" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Image 
+              src="/video300_frames/frame_001.jpg"
+              alt="DILIO Logo Placeholder"
+              width={1920}
+              height={1080}
+              priority={true}
+              className="w-[85vw] h-[85vh] md:w-[65vw] md:h-[65vh] object-contain -translate-y-8 md:translate-y-0 mix-blend-multiply transition-opacity duration-500"
+            />
           </div>
         )}
+
+        <canvas
+          ref={canvasRef}
+          className="w-[85vw] h-[85vh] md:w-[65vw] md:h-[65vh] object-contain -translate-y-8 md:translate-y-0 mix-blend-multiply"
+          style={{ opacity: framesLoaded ? 1 : 0, transition: 'opacity 0.6s ease-in-out' }}
+        />
       </div>
     </div>
   );
