@@ -69,8 +69,7 @@ export default function Home() {
         <ScrollVideo totalFrames={329} />
         
         {/* Cinematic Text Overlays */}
-        <div className="fixed inset-0 pointer-events-none z-20 flex flex-col justify-between p-12 md:p-20">
-            <div className="w-[130px]" />
+        <div className="fixed inset-0 pointer-events-none z-20 flex flex-col items-center justify-center p-12 md:p-20">
 
           <motion.div 
             style={{ 
@@ -87,7 +86,7 @@ export default function Home() {
 
           <motion.div 
             style={{ opacity: textOpacity3 }}
-            className="flex justify-center"
+            className="absolute bottom-12 md:bottom-20 flex justify-center w-full"
           >
             <span className="label-xs tracking-[0.3em] text-center max-w-md">
               SOUND & ART

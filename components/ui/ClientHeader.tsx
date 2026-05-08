@@ -35,7 +35,7 @@ export function ClientHeader() {
       </div>
       
       {/* Central DILIO Logo working as a Home button */}
-      <div className="flex-1 flex justify-center">
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         <div 
           className="transition-all duration-700 ease-in-out"
           style={{ 

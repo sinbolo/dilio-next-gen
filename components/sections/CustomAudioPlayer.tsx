@@ -613,15 +613,15 @@ export function CustomAudioPlayer() {
             <motion.div
               key={`connecting-${isConnecting}`}
               initial={{ 
-                x: -450, 
-                y: isConnecting === 2 ? -25 : -145, 
+                x: "-45%", 
+                y: isConnecting === 2 ? "-5%" : "-15%", 
                 scale: 0.04, 
                 opacity: 0, 
                 rotateZ: isConnecting === 2 ? 12 : -15 
               }}
               animate={{ 
-                x: [-450, -350, isConnecting === 2 ? (isMobile ? -124 : -222) : (isMobile ? -130 : -228)], 
-                y: [isConnecting === 2 ? -25 : -145, -205, isMobile ? -100 : -150], 
+                x: ["-45%", "-35%", isConnecting === 2 ? (isMobile ? "-31%" : "-22.2%") : (isMobile ? "-32.5%" : "-22.8%")], 
+                y: [isConnecting === 2 ? "-5%" : "-15%", "-20%", isMobile ? "-25%" : "-15%"], 
                 scale: [0.04, 0.08, 0.065], 
                 rotateZ: [isConnecting === 2 ? 12 : -15, 20, 0],
                 opacity: [0, 1, 1]
@@ -652,7 +652,7 @@ export function CustomAudioPlayer() {
               style={{ 
                 width: '100%', 
                 height: '100%',
-                transform: `translateX(${activeUsb === 1 ? (isMobile ? -130 : -228) : (isMobile ? -124 : -222)}px) translateY(${isMobile ? -100 : -150}px) scale(0.065)`
+                transform: `translateX(${activeUsb === 1 ? (isMobile ? "-32.5%" : "-22.8%") : (isMobile ? "-31%" : "-22.2%")}) translateY(${isMobile ? "-25%" : "-15%"}) scale(0.065)`
               }}
             >
               <Image 
