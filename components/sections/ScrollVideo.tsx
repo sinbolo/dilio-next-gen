@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
 import { useScroll, useTransform, useSpring } from 'framer-motion';
 
 interface ScrollVideoProps {
