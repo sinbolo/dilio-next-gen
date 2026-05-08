@@ -535,7 +535,7 @@ export function MerchGallery() {
       onTouchStart={handleTouchUpdate}
       onTouchMove={handleTouchUpdate}
       onTouchEnd={handleTouchEnd}
-      className="gravity-merch-zone min-h-screen relative flex items-center justify-center bg-black py-[80px] md:py-[120px] overflow-hidden isolate cursor-none touch-none md:touch-pan-y"
+      className="gravity-merch-zone min-h-screen relative flex items-center justify-center bg-black py-[80px] md:py-[120px] overflow-hidden isolate cursor-none touch-pan-y"
     >
       <div 
         className="absolute inset-0 z-0 transition-opacity duration-1000 pointer-events-none"

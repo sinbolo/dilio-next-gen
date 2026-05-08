@@ -45,6 +45,9 @@ export function CustomAudioPlayer() {
   const [duration, setDuration] = useState(0);
   const widgetRef = useRef<any>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const [isInView, setIsInView] = useState(false);
 
   // Sync mounted state to avoid hydration mismatch
   useEffect(() => {
@@ -52,7 +55,17 @@ export function CustomAudioPlayer() {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      observer.disconnect();
+    };
   }, []);
 
   // SoundCloud Widget Logic
@@ -152,7 +165,7 @@ export function CustomAudioPlayer() {
   const offsetRef = useRef<number>(0);
 
   useEffect(() => {
-    if (!isPlaying) {
+    if (!isPlaying || !isInView) {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
       return;
     }
@@ -240,12 +253,12 @@ export function CustomAudioPlayer() {
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [isPlaying, isMobile]);
+  }, [isPlaying, isMobile, isInView]);
 
   if (!mounted) return null;
 
   return (
-    <section id="section-music" className="w-full bg-white py-24">
+    <section ref={sectionRef} id="section-music" className="w-full bg-white py-24">
       <div className="relative w-full max-w-[1400px] mx-auto px-4 flex flex-col items-center">
         {/* Seamless Container (Uniform with Bio section bg-white) */}
         <div className="relative w-[180vw] md:w-full left-1/2 md:left-auto ml-[-90vw] md:ml-0 aspect-[16/9] max-h-[800px] bg-white overflow-visible flex items-center justify-center">
