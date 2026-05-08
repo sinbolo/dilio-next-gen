@@ -184,10 +184,15 @@ function ProductCard({
 
 export function MerchGallery() {
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const isHoveringRef = useRef(false);
   
   useEffect(() => {
     setMounted(true);
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
   const mouseX = useMotionValue(-9999);
   const mouseY = useMotionValue(-9999);
