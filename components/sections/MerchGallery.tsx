@@ -210,6 +210,11 @@ export function MerchGallery() {
   // Store motion values in refs for stable RAF access
   const mouseXRef = useRef(mouseX);
   const mouseYRef = useRef(mouseY);
+  const isMobileRef = useRef(false);
+
+  useEffect(() => {
+    isMobileRef.current = isMobile;
+  }, [isMobile]);
   
   // 1. Element Discovery & Rect Caching (Run on mount and when items might change)
   useEffect(() => {
@@ -314,10 +319,10 @@ export function MerchGallery() {
         section.style.setProperty('--mouse-x', `${rx}px`);
         section.style.setProperty('--mouse-y', `${ry}px`);
         
-        // 2. Optical Constants (Balanced surgical precision)
-        const R_CLEAN = 15;
-        const R_GLOW = 45;
-        const R_FALLOFF = 90;
+        // 2. Optical Constants (Optimized for mobile performance/visibility)
+        const R_CLEAN = isMobileRef.current ? 25 : 15;
+        const R_GLOW = isMobileRef.current ? 65 : 45;
+        const R_FALLOFF = isMobileRef.current ? 120 : 90;
 
         // 3. Drive Flashlight Cursor
         const flare = flareRef.current;
@@ -525,7 +530,7 @@ export function MerchGallery() {
       onTouchStart={handleTouchUpdate}
       onTouchMove={handleTouchUpdate}
       onTouchEnd={handleTouchEnd}
-      className="gravity-merch-zone min-h-screen relative flex items-center justify-center bg-black py-[120px] overflow-hidden isolate cursor-none touch-pan-y"
+      className="gravity-merch-zone min-h-screen relative flex items-center justify-center bg-black py-[80px] md:py-[120px] overflow-hidden isolate cursor-none touch-none md:touch-pan-y"
     >
       <div 
         className="absolute inset-0 z-0 transition-opacity duration-1000 pointer-events-none"
@@ -609,7 +614,7 @@ export function MerchGallery() {
       {/* EASTER EGG: Dilio Action Figure (Relocated to Outer Left Void) */}
       <div 
         data-easter-egg
-        className="absolute left-4 md:left-[9%] bottom-[10%] md:bottom-[22%] z-[70] w-24 h-48 md:w-32 md:h-64 pointer-events-auto cursor-none" // Relocated and resized for mobile
+        className="absolute left-6 md:left-[9%] bottom-[12%] md:bottom-[22%] z-[70] w-28 h-56 md:w-32 md:h-64 pointer-events-auto cursor-none" // Relocated and resized for mobile
         onClick={(e) => {
           e.stopPropagation();
           
