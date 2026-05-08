@@ -152,7 +152,7 @@ export function UpcomingSetAnnouncement({ forceOpen, onOpenChange }: { forceOpen
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 1.1, opacity: 0, y: -20 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-3xl overflow-hidden pointer-events-auto shadow-[0_0_50px_rgba(0,0,0,0.5)] max-h-[80vh] md:max-h-[90vh] overflow-y-auto"
+              className="relative w-[92%] max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden pointer-events-auto shadow-[0_0_50px_rgba(0,0,0,0.5)] max-h-[70vh] md:max-h-[90vh] overflow-y-auto scale-95 md:scale-100"
             >
               <div className="absolute top-0 right-0 h-full w-8 md:w-16 bg-[#22c55e] flex items-center justify-center overflow-hidden">
                 <motion.div 
@@ -182,7 +182,7 @@ export function UpcomingSetAnnouncement({ forceOpen, onOpenChange }: { forceOpen
 
               <div className="absolute -top-24 -left-24 w-64 h-64 bg-[#22c55e]/10 blur-[100px] rounded-full" />
 
-              <div className="relative z-10 p-6 md:p-12 pr-12 md:pr-24">
+              <div className="relative z-10 p-4 md:p-12 pr-10 md:pr-24">
                 <div className="flex justify-between items-start mb-12">
                   <div className="flex items-center gap-3">
                     <div className="relative">
@@ -226,7 +226,7 @@ export function UpcomingSetAnnouncement({ forceOpen, onOpenChange }: { forceOpen
                         ]
                       }}
                       transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                      className="display-md text-white tracking-tighter leading-none mb-2 uppercase"
+                      className="text-2xl md:display-md text-white tracking-tighter leading-none mb-2 uppercase"
                     >
                       OJEANDO <br /> FESTIVAL
                     </motion.h2>

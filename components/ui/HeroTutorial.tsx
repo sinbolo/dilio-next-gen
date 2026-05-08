@@ -35,13 +35,13 @@ export function HeroTutorial() {
           y: yTranslate,
           filter: `blur(${blur}px)`
         }}
-        className="fixed inset-0 z-[100] pointer-events-none flex flex-col items-center justify-end pb-4 overflow-hidden"
+        className="fixed inset-0 z-[100] pointer-events-none flex flex-col items-center justify-end pb-24 md:pb-8 overflow-hidden"
       >
         <motion.div 
           initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
           animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
           transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
-          className="relative flex flex-col items-center gap-2 px-12 py-16"
+          className="relative flex flex-col items-center gap-2 px-4 md:px-12 py-8 md:py-16"
         >
           {/* Localized Darkness Pocket for contrast */}
           <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(0,0,0,0.95)_0%,transparent_80%)] -z-10 blur-xl" />
