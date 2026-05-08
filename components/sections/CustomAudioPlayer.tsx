@@ -191,19 +191,19 @@ export function CustomAudioPlayer() {
       
       ctx.clearRect(0, 0, w, h);
       
-      // Draw Waveform - Mobile optimized
-      const barWidth = isMobile ? 4 : 2;
-      const gap = isMobile ? 3 : 1;
+      // Draw Waveform - Ultra Mobile Optimized
+      const barWidth = isMobile ? 8 : 2;
+      const gap = isMobile ? 6 : 1;
       const step = barWidth + gap;
-      const count = Math.ceil(w / step);
+      const count = isMobile ? 20 : Math.ceil(w / step);
       
-      offsetRef.current += isMobile ? 1.8 : 2.4; 
+      offsetRef.current += isMobile ? 1.2 : 2.4; 
       
       const startI = Math.floor(offsetRef.current / step);
       const pixelOffset = offsetRef.current % step;
 
       for (let i = 0; i < count + 2; i++) {
-        const x = (i * step) - pixelOffset;
+        const x = isMobile ? (i * step) + (w/2 - (count*step)/2) : (i * step) - pixelOffset;
         const dataIndex = startI + i;
 
         // --- Hardware-Accurate Energy Modeling ---
