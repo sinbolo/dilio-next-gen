@@ -138,7 +138,7 @@ export function UpcomingSetAnnouncement({ forceOpen, onOpenChange }: { forceOpen
       <div ref={sectionRef} className="absolute inset-0 pointer-events-none" />
       <AnimatePresence>
         {isVisible && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8 pointer-events-none">
+          <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 md:p-8 pointer-events-none">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -152,9 +152,9 @@ export function UpcomingSetAnnouncement({ forceOpen, onOpenChange }: { forceOpen
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 1.1, opacity: 0, y: -20 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-3xl overflow-hidden pointer-events-auto shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+              className="relative w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-3xl overflow-hidden pointer-events-auto shadow-[0_0_50px_rgba(0,0,0,0.5)] max-h-[90vh] overflow-y-auto"
             >
-              <div className="absolute top-0 right-0 h-full w-12 md:w-16 bg-[#22c55e] flex items-center justify-center overflow-hidden">
+              <div className="absolute top-0 right-0 h-full w-8 md:w-16 bg-[#22c55e] flex items-center justify-center overflow-hidden">
                 <motion.div 
                   animate={{ opacity: [1, 0.6, 1] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
@@ -182,7 +182,7 @@ export function UpcomingSetAnnouncement({ forceOpen, onOpenChange }: { forceOpen
 
               <div className="absolute -top-24 -left-24 w-64 h-64 bg-[#22c55e]/10 blur-[100px] rounded-full" />
 
-              <div className="relative z-10 p-8 md:p-12 pr-20 md:pr-24">
+              <div className="relative z-10 p-6 md:p-12 pr-12 md:pr-24">
                 <div className="flex justify-between items-start mb-12">
                   <div className="flex items-center gap-3">
                     <div className="relative">
@@ -192,9 +192,10 @@ export function UpcomingSetAnnouncement({ forceOpen, onOpenChange }: { forceOpen
                   </div>
                   <button 
                     onClick={() => setIsVisible(false)}
-                    className="group p-2 bg-white/5 hover:bg-white/10 rounded-full transition-all duration-300"
+                    className="group p-3 md:p-2 bg-white/10 md:bg-white/5 hover:bg-white/20 rounded-full transition-all duration-300"
+                    title="Close"
                   >
-                    <X size={18} className="text-white/40 group-hover:text-white group-hover:rotate-90 transition-all" />
+                    <X size={24} className="text-white md:text-white/40 group-hover:text-white group-hover:rotate-90 transition-all" />
                   </button>
                 </div>
 

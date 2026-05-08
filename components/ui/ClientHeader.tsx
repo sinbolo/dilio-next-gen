@@ -39,9 +39,9 @@ export function ClientHeader() {
         <div 
           className="transition-all duration-700 ease-in-out"
           style={{ 
-            opacity: isScrolled ? 1 : 0,
-            transform: isScrolled ? 'translateY(0)' : 'translateY(-10px)',
-            pointerEvents: isScrolled ? 'auto' : 'none'
+            opacity: 1,
+            transform: 'translateY(0)',
+            pointerEvents: 'auto'
           }}
         >
           <Navbar3DLogo onClick={scrollToTop} />

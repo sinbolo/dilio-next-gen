@@ -70,12 +70,7 @@ export default function Home() {
         
         {/* Cinematic Text Overlays */}
         <div className="fixed inset-0 pointer-events-none z-20 flex flex-col justify-between p-12 md:p-20">
-          <motion.div 
-            style={{ opacity: textOpacity1 }}
-            className="flex justify-between items-start"
-          >
-            <span className="label-md tracking-[0.2em]">DILIO // 001</span>
-          </motion.div>
+            <div className="w-[130px]" />
 
           <motion.div 
             style={{ 
