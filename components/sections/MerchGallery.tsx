@@ -87,7 +87,7 @@ function ProductCard({
     <div 
       ref={cardRef}
       data-measure={product.id}
-      className="group flex flex-col relative w-[85%] mx-auto aspect-[2/3] bg-transparent rounded-sm isolate border border-transparent transition-transform duration-500 cursor-none"
+      className="group flex flex-col relative w-[85%] mx-auto aspect-[2/3] bg-transparent rounded-sm isolate border border-transparent transition-transform duration-500 cursor-none will-change-transform"
     >
       {/* 0. Base Content Layer (Clipped) */}
       <div className="absolute inset-0 z-0 overflow-hidden rounded-sm">
@@ -175,7 +175,8 @@ function ProductCard({
           transform: `translate(-50%, calc(-50% + ${product.vY || '0%'})) scale(${product.vS || 1})`,
           filter: `brightness(var(--veil-brightness, 0.45)) drop-shadow(0 0 30px rgba(0,0,0,1))`,
           maskRepeat: 'no-repeat',
-          WebkitMaskRepeat: 'no-repeat'
+          WebkitMaskRepeat: 'no-repeat',
+          willChange: 'mask-image, -webkit-mask-image, filter'
         } as any}
       />
     </div>
@@ -201,6 +202,7 @@ export function MerchGallery() {
   const { addItem, isCartOpen, setIsCartOpen, unlockFreeShipping } = useCart();
   const cardRectsRef = useRef<Record<string, DOMRect>>({});
   const [rectsLoaded, setRectsLoaded] = useState(false);
+  const [isInView, setIsInView] = useState(false);
   
   // High-performance refs for the physics loop
   const flareRef = useRef<HTMLDivElement>(null);
@@ -262,13 +264,30 @@ export function MerchGallery() {
     
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('resize', updateCache);
-    window.addEventListener('scroll', updateCache, { passive: true });
+    
+    // Using a more efficient way to track scroll-based position shifts
+    const scrollObserver = () => {
+       // Minimal updates during scroll
+       if (sectionRef.current) {
+         const rect = sectionRef.current.getBoundingClientRect();
+         sectionRef.current.style.setProperty('--section-top', `${rect.top}px`);
+       }
+    };
+    window.addEventListener('scroll', scrollObserver, { passive: true });
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0.05 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+
     return () => {
       clearTimeout(timer);
       clearTimeout(timer2);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', updateCache);
-      window.removeEventListener('scroll', updateCache);
+      window.removeEventListener('scroll', scrollObserver);
+      observer.disconnect();
     };
   }, [mounted]);
 
@@ -308,6 +327,10 @@ export function MerchGallery() {
     let rafId: number;
     
     const syncPhysics = () => {
+      if (!isInView) {
+        rafId = requestAnimationFrame(syncPhysics);
+        return;
+      }
       const section = sectionRef.current;
       if (section) {
         const rect = section.getBoundingClientRect();
@@ -517,7 +540,7 @@ export function MerchGallery() {
 
     rafId = requestAnimationFrame(syncPhysics);
     return () => cancelAnimationFrame(rafId);
-  }, [mounted]);
+  }, [mounted, isInView]);
 
   const handleMeasure = useCallback((id: string, rect: DOMRect) => {
     cardRectsRef.current[id] = rect;
