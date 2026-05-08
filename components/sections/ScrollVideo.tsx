@@ -123,7 +123,7 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
             <img 
               src="/video300_frames/frame_001.jpg"
               alt=""
-              fetchpriority="high"
+              fetchPriority="high"
               style={{
                 width: '85vw',
                 height: '85vh',
