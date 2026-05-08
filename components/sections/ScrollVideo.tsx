@@ -30,30 +30,38 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
   const frameIndex = useTransform(smoothProgress, [0, 1], [1, totalFrames], { clamp: true });
 
   // Load frames in background — never blocks render
+  // Load and render the FIRST frame immediately with absolute priority
   useEffect(() => {
-    imagesRef.current = new Array(totalFrames).fill(null);
-    let loaded = 0;
-    const BATCH = 30; // Load first 30 frames immediately
+    const initLoad = async () => {
+      imagesRef.current = new Array(totalFrames).fill(null);
+      const firstImg = new Image();
+      const firstFrameNum = "001";
+      firstImg.src = `/video300_frames/frame_${firstFrameNum}.jpg`;
+      
+      await new Promise((resolve) => {
+        firstImg.onload = () => {
+          imagesRef.current[0] = firstImg;
+          setFramesLoaded(true);
+          resolve(null);
+        };
+        firstImg.onerror = () => {
+          setFramesLoaded(true); // Don't block even if first frame fails
+          resolve(null);
+        };
+      });
 
-    const loadFrame = (i: number) => {
-      const img = new Image();
-      const frameNum = String(i).padStart(3, '0');
-      img.src = `/video300_frames/frame_${frameNum}.jpg`;
-      img.onload = () => {
-        imagesRef.current[i - 1] = img;
-        loaded++;
-        if (loaded === 1) setFramesLoaded(true);
-      };
-      img.onerror = () => {
-        loaded++;
-        if (loaded === 1) setFramesLoaded(true);
-      };
+      // After first frame is visible, load the rest in the background
+      for (let i = 2; i <= totalFrames; i++) {
+        const img = new Image();
+        const frameNum = String(i).padStart(3, '0');
+        img.src = `/video300_frames/frame_${frameNum}.jpg`;
+        img.onload = () => {
+          imagesRef.current[i - 1] = img;
+        };
+      }
     };
 
-    // Load ALL frames immediately for maximum speed as requested
-    for (let i = 1; i <= totalFrames; i++) {
-      loadFrame(i);
-    }
+    initLoad();
   }, [totalFrames]);
 
   // Render loop
