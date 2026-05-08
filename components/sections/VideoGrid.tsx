@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, type MouseEvent } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { VideoTutorial } from "../ui/VideoTutorial";
@@ -162,7 +162,7 @@ export function VideoGrid() {
     }, 1500);
   };
 
-  const handleLike = (e: MouseEvent) => {
+  const handleLike = (e: React.MouseEvent) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const spawnX = rect.left + rect.width / 2;
     const spawnY = rect.top;
@@ -183,7 +183,7 @@ export function VideoGrid() {
     }, 4000);
   };
 
-  const handleDislike = (e: MouseEvent) => {
+  const handleDislike = (e: React.MouseEvent) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const spawnX = rect.left + rect.width / 2;
     const spawnY = rect.top;
@@ -203,7 +203,7 @@ export function VideoGrid() {
     }, 4000);
   };
 
-  const handleDownload = (e: MouseEvent) => {
+  const handleDownload = (e: React.MouseEvent) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const spawnX = rect.left + rect.width / 2;
     const spawnY = rect.top;
@@ -223,7 +223,7 @@ export function VideoGrid() {
     }, 3000);
   };
 
-  const handleShare = (e: MouseEvent) => {
+  const handleShare = (e: React.MouseEvent) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const spawnX = rect.left + rect.width / 2;
     const spawnY = rect.top;

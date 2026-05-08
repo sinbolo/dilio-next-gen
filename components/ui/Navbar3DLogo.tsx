@@ -18,11 +18,11 @@ export const Navbar3DLogo: React.FC<{ onClick?: () => void }> = ({ onClick }) =>
   });
 
   // Map the scroll to multiple rotations
-    const rawFrameIndex = useTransform(smoothProgress, [0, 1], [1, totalFrames * 3], {
-          clamp: true,
-    });
-    const frameIndex = useTransform(rawFrameIndex, (v) => ((Math.round(v) - 1) % totalFrames) + 1);
-  
+  const frameIndex = useTransform(smoothProgress, [0, 1], [1, totalFrames * 3], { 
+    clamp: true,
+    transform: (v) => ((Math.round(v) - 1) % totalFrames) + 1
+  });
+
   const processImage = useCallback((img: HTMLImageElement, index: number) => {
     if (processedFramesRef.current.has(index)) return;
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, type RefObject, type MouseEvent, type TouchEvent } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useCart } from "@/lib/CartContext";
 import { ShoppingBag } from "lucide-react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
@@ -59,7 +59,7 @@ function ProductCard({
 }: { 
   product: typeof products[0], 
   addItem: any, 
-  sectionRef: RefObject<HTMLElement | null>,
+  sectionRef: React.RefObject<HTMLElement | null>,
   onMeasure: (id: string, rect: DOMRect) => void
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -267,7 +267,7 @@ export function MerchGallery() {
     mouseYRef.current = mouseY;
   }, [mouseX, mouseY]);
 
-  const handleMouseMove = (e: MouseEvent | globalThis.MouseEvent) => {
+  const handleMouseMove = (e: React.MouseEvent | MouseEvent) => {
     isHoveringRef.current = true;
     mouseX.set(e.clientX);
     mouseY.set(e.clientY);
@@ -275,7 +275,7 @@ export function MerchGallery() {
 
   const touchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleTouchUpdate = (e: TouchEvent) => {
+  const handleTouchUpdate = (e: React.TouchEvent) => {
     if (touchTimeoutRef.current) clearTimeout(touchTimeoutRef.current);
     isHoveringRef.current = true;
     const touch = e.touches[0];
