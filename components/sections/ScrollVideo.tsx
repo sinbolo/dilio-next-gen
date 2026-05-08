@@ -82,11 +82,12 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
     let rafId: number;
 
     const render = () => {
+      if (!isInView) return;
+      
       const imgs = imagesRef.current;
       let current = Math.round(frameIndex.get());
       current = Math.max(1, Math.min(totalFrames, current));
 
-      // SKIP processing if we already rendered this frame
       if (current === lastIndexRef.current) {
         rafId = requestAnimationFrame(render);
         return;
@@ -96,7 +97,7 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
       const img = imgs[current - 1];
       const canvas = canvasRef.current;
       if (canvas && img?.complete && img.naturalWidth > 0) {
-        const ctx = canvas.getContext('2d', { willReadFrequently: false });
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
         if (ctx) {
           if (canvas.width !== img.naturalWidth) {
             canvas.width = img.naturalWidth;
@@ -104,6 +105,17 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
           }
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const d = imageData.data;
+          for (let i = 0; i < d.length; i += 4) {
+            const r = d[i], g = d[i+1], b = d[i+2];
+            const brightness = (r + g + b) / 3;
+            if (brightness > 215) {
+              d[i + 3] = Math.max(0, (255 - brightness) / 40 * 255);
+            }
+          }
+          ctx.putImageData(imageData, 0, 0);
         }
       }
       rafId = requestAnimationFrame(render);
@@ -115,8 +127,8 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
 
   return (
     <div ref={containerRef} className="relative w-full h-[200vh]">
-      <div className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden bg-white">
-        {/* Instant Placeholder - Raw IMG tag for maximum bypass of hydration delays */}
+      <div className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden bg-transparent">
+        {/* Instant Placeholder */}
         {!framesLoaded && (
           <div className="absolute inset-0 flex items-center justify-center">
             <img 
@@ -127,7 +139,7 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
                 width: '85vw',
                 height: '85vh',
                 objectFit: 'contain',
-                mixBlendMode: 'multiply'
+                opacity: 0.1
               }}
               className="md:w-[65vw] md:h-[65vh] -translate-y-8 md:translate-y-0"
             />
@@ -136,8 +148,12 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
 
         <canvas
           ref={canvasRef}
-          className="w-[85vw] h-[85vh] md:w-[65vw] md:h-[65vh] object-contain -translate-y-8 md:translate-y-0 mix-blend-multiply"
-          style={{ opacity: framesLoaded ? 1 : 0, transition: 'opacity 0.6s ease-in-out' }}
+          className="w-[85vw] h-[85vh] md:w-[65vw] md:h-[65vh] object-contain -translate-y-8 md:translate-y-0"
+          style={{ 
+            opacity: framesLoaded ? 1 : 0, 
+            transition: 'opacity 0.6s ease-in-out',
+            filter: 'contrast(1.1) brightness(1.05)'
+          }}
         />
       </div>
     </div>

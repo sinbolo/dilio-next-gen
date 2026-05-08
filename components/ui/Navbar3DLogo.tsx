@@ -35,11 +35,13 @@ export const Navbar3DLogo: React.FC<{ onClick?: () => void }> = ({ onClick }) =>
       const imageData = octx.getImageData(0, 0, offscreen.width, offscreen.height);
       const d = imageData.data;
       
-      // Remove white background
+      // Remove white/gray background (#eeeeee area)
       for (let i = 0; i < d.length; i += 4) {
-        const brightness = (d[i] + d[i + 1] + d[i + 2]) / 3;
-        if (brightness > 235) d[i + 3] = 0;
-        else if (brightness > 220) d[i + 3] = ((235 - brightness) / 15) * 255;
+        const r = d[i], g = d[i+1], b = d[i+2];
+        const brightness = (r + g + b) / 3;
+        if (brightness > 210) {
+          d[i + 3] = Math.max(0, (250 - brightness) / 40 * 255);
+        }
       }
       
       octx.putImageData(imageData, 0, 0);
@@ -137,8 +139,9 @@ export const Navbar3DLogo: React.FC<{ onClick?: () => void }> = ({ onClick }) =>
         className="w-full h-full object-contain"
         style={{ 
           opacity: firstFrameReady ? 1 : 0, 
-          transition: 'opacity 0.3s ease-in-out',
-          willChange: 'transform' // Changed from contents to transform for better GPU optimization
+          transition: 'opacity 0.4s ease-in-out',
+          filter: 'contrast(1.2) brightness(1.15) drop-shadow(0 0 5px rgba(255,255,255,0.05))',
+          willChange: 'transform'
         }}
       />
     </div>
