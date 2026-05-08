@@ -34,7 +34,27 @@ export default function Home() {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+
+    // Intelligent Scroll Restoration
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    // If no specific section in URL, always start at the top
+    if (!window.location.hash) {
+      window.scrollTo(0, 0);
+    } else {
+      // If there IS a hash, let it settle for a moment then scroll to it
+      setTimeout(() => {
+        const id = window.location.hash.slice(1);
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView();
+      }, 500);
+    }
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
   }, []);
 
   // Premium Transform for "HOUSE MÚSIC" - Color & Movement
