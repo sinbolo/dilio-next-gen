@@ -42,11 +42,11 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
       img.onload = () => {
         imagesRef.current[i - 1] = img;
         loaded++;
-        if (loaded === BATCH) setFramesLoaded(true);
+        if (loaded === 1) setFramesLoaded(true);
       };
       img.onerror = () => {
         loaded++;
-        if (loaded === BATCH) setFramesLoaded(true);
+        if (loaded === 1) setFramesLoaded(true);
       };
     };
 
