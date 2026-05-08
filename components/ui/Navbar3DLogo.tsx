@@ -70,22 +70,26 @@ export const Navbar3DLogo: React.FC<{ onClick?: () => void }> = ({ onClick }) =>
       });
     };
 
-    // Load frames in small batches to avoid choking the connection on mobile
-    const loadSequentially = async () => {
-      const batchSize = 5;
-      for (let i = 1; i <= totalFrames; i += batchSize) {
-        const batch = [];
-        for (let j = 0; j < batchSize && (i + j) <= totalFrames; j++) {
-          batch.push(loadAndProcess(i + j));
-        }
+    // Load and process frames with priority for the first one
+    const loadAll = async () => {
+      // 1. Load and render the FIRST frame immediately
+      await loadAndProcess(1);
+      setFirstFrameReady(true);
+
+      // 2. Load the rest in larger batches for speed
+      const remainingFrames = Array.from({ length: totalFrames - 1 }, (_, i) => i + 2);
+      const batchSize = 10;
+      
+      for (let i = 0; i < remainingFrames.length; i += batchSize) {
+        const batch = remainingFrames.slice(i, i + batchSize).map(num => loadAndProcess(num));
         await Promise.all(batch);
-        // Small breathing room for the main thread
-        await new Promise(resolve => setTimeout(resolve, 50));
+        // Give the UI a tiny bit of time to breathe
+        await new Promise(resolve => setTimeout(resolve, 10));
       }
     };
 
-    loadSequentially();
-  }, [processImage, totalFrames]);
+    loadAll();
+  }, [loadAndProcess, totalFrames]);
 
   const lastRenderedIndex = useRef<number>(-1);
   const renderFrame = (index: number) => {
