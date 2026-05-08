@@ -152,7 +152,7 @@ export function UpcomingSetAnnouncement({ forceOpen, onOpenChange }: { forceOpen
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 1.1, opacity: 0, y: -20 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-[92%] max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden pointer-events-auto shadow-[0_0_50px_rgba(0,0,0,0.5)] max-h-[70vh] md:max-h-[90vh] overflow-y-auto scale-95 md:scale-100"
+              className="relative w-[92%] max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden pointer-events-auto shadow-[0_0_50px_rgba(0,0,0,0.5)] max-h-[85vh] md:max-h-[90vh] overflow-y-auto scale-95 md:scale-100"
             >
               <div className="absolute top-0 right-0 h-full w-8 md:w-16 bg-[#22c55e] flex items-center justify-center overflow-hidden">
                 <motion.div 
@@ -300,7 +300,7 @@ export function UpcomingSetAnnouncement({ forceOpen, onOpenChange }: { forceOpen
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8 }}
-                    className="grid grid-cols-1 md:grid-cols-4 gap-3"
+                    className="grid grid-cols-2 md:grid-cols-4 gap-4"
                   >
                     <button 
                       onClick={handleCopy}
