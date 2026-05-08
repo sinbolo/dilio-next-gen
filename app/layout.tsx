@@ -55,6 +55,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="preload" href="/video300_frames/frame_001.jpg" as="image" fetchpriority="high" />
+      </head>
       <body className={`${spaceGrotesk.variable} ${manrope.variable} ${inter.variable} ${architects.variable} ${marker.variable} font-body bg-surface text-primary antialiased overflow-x-hidden w-full relative`}>
         {/* Carga asíncrona de SoundCloud SDK (no penaliza carga y respeta contexto global) */}
         <Script src="https://w.soundcloud.com/player/api.js" strategy="lazyOnload" />

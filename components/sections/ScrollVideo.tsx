@@ -117,16 +117,20 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
   return (
     <div ref={containerRef} className="relative w-full h-[200vh]">
       <div className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden bg-white">
-        {/* Instant Placeholder Image */}
+        {/* Instant Placeholder - Raw IMG tag for maximum bypass of hydration delays */}
         {!framesLoaded && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <Image 
+            <img 
               src="/video300_frames/frame_001.jpg"
-              alt="DILIO Logo Placeholder"
-              width={1920}
-              height={1080}
-              priority={true}
-              className="w-[85vw] h-[85vh] md:w-[65vw] md:h-[65vh] object-contain -translate-y-8 md:translate-y-0 mix-blend-multiply transition-opacity duration-500"
+              alt=""
+              fetchpriority="high"
+              style={{
+                width: '85vw',
+                height: '85vh',
+                objectFit: 'contain',
+                mixBlendMode: 'multiply'
+              }}
+              className="md:w-[65vw] md:h-[65vh] -translate-y-8 md:translate-y-0"
             />
           </div>
         )}
