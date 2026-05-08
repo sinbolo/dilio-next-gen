@@ -53,21 +53,39 @@ export const Navbar3DLogo: React.FC<{ onClick?: () => void }> = ({ onClick }) =>
     imagesRef.current = new Array(totalFrames).fill(null);
 
     const loadAndProcess = (i: number) => {
-      if (imagesRef.current[i - 1]) return;
-      const img = new Image();
-      const num = String(i).padStart(3, '0');
-      img.src = `/frames-menu/frame_${num}.jpg`;
-      img.onload = () => {
-        imagesRef.current[i - 1] = img;
-        processImage(img, i);
-      };
+      return new Promise<void>((resolve) => {
+        if (imagesRef.current[i - 1]) {
+          resolve();
+          return;
+        }
+        const img = new Image();
+        const num = String(i).padStart(3, '0');
+        img.src = `/frames-menu/frame_${num}.jpg`;
+        img.onload = () => {
+          imagesRef.current[i - 1] = img;
+          processImage(img, i);
+          resolve();
+        };
+        img.onerror = () => resolve(); // Don't block if one frame fails
+      });
     };
 
-    // Load ALL frames immediately
-    for (let i = 1; i <= totalFrames; i++) {
-      loadAndProcess(i);
-    }
-  }, [processImage]);
+    // Load frames in small batches to avoid choking the connection on mobile
+    const loadSequentially = async () => {
+      const batchSize = 5;
+      for (let i = 1; i <= totalFrames; i += batchSize) {
+        const batch = [];
+        for (let j = 0; j < batchSize && (i + j) <= totalFrames; j++) {
+          batch.push(loadAndProcess(i + j));
+        }
+        await Promise.all(batch);
+        // Small breathing room for the main thread
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+    };
+
+    loadSequentially();
+  }, [processImage, totalFrames]);
 
   const lastRenderedIndex = useRef<number>(-1);
   const renderFrame = (index: number) => {
