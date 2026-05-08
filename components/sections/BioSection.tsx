@@ -88,7 +88,7 @@ export function BioSection() {
               {/* Base Image (Off) - Always visible initially */}
               <motion.img 
                 src="/assets/logo_bio_off_clean.png"
-                className="h-full w-auto object-contain mix-blend-multiply relative left-2 md:left-0 brightness-110 contrast-125"
+                className="h-full w-auto object-contain mix-blend-multiply relative left-2 md:left-0 brightness-110 contrast-[1.5] saturate-0"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
@@ -131,7 +131,7 @@ export function BioSection() {
               >
                 <img 
                   src="/assets/logo_bio_on_white_led.png"
-                  className="h-full w-auto object-contain mix-blend-multiply brightness-[1.3] contrast-[1.5]"
+                  className="h-full w-auto object-contain mix-blend-multiply brightness-[1.4] contrast-[2] saturate-0"
                   alt="Dilio Logo Active"
                 />
               </motion.div>
