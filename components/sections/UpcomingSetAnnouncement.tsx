@@ -138,7 +138,7 @@ export function UpcomingSetAnnouncement({ forceOpen, onOpenChange }: { forceOpen
       <div ref={sectionRef} className="absolute inset-0 pointer-events-none" />
       <AnimatePresence>
         {isVisible && (
-          <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 md:p-8 pointer-events-none">
+          <div className="fixed inset-0 z-[3000] flex items-center justify-center p-6 py-12 md:p-8 pointer-events-none">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -152,7 +152,7 @@ export function UpcomingSetAnnouncement({ forceOpen, onOpenChange }: { forceOpen
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 1.1, opacity: 0, y: -20 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-3xl overflow-hidden pointer-events-auto shadow-[0_0_50px_rgba(0,0,0,0.5)] max-h-[90vh] overflow-y-auto"
+              className="relative w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-3xl overflow-hidden pointer-events-auto shadow-[0_0_50px_rgba(0,0,0,0.5)] max-h-[80vh] md:max-h-[90vh] overflow-y-auto"
             >
               <div className="absolute top-0 right-0 h-full w-8 md:w-16 bg-[#22c55e] flex items-center justify-center overflow-hidden">
                 <motion.div 
