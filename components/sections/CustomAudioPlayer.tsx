@@ -191,13 +191,13 @@ export function CustomAudioPlayer() {
       
       ctx.clearRect(0, 0, w, h);
       
-      // Draw Waveform (Infinite High-Density System)
-      const barWidth = 2;
-      const gap = 0.5; // High density, nearly solid
+      // Draw Waveform - Mobile optimized
+      const barWidth = isMobile ? 4 : 2;
+      const gap = isMobile ? 3 : 1;
       const step = barWidth + gap;
       const count = Math.ceil(w / step);
       
-      offsetRef.current += 2.4; 
+      offsetRef.current += isMobile ? 1.8 : 2.4; 
       
       const startI = Math.floor(offsetRef.current / step);
       const pixelOffset = offsetRef.current % step;
