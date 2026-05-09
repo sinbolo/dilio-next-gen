@@ -11,7 +11,7 @@ export function MusicTutorial() {
   const [isFast, setIsFast] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const ref = useRef(null);
-  const inView = useInView(ref, { amount: 0.6 });
+  const inView = useInView(ref, { amount: 0.1 });
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -24,7 +24,8 @@ export function MusicTutorial() {
   const [hasPassedHero, setHasPassedHero] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    setHasPassedHero(latest > 800);
+    const threshold = isMobile ? 400 : 800;
+    setHasPassedHero(latest > threshold);
   });
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
