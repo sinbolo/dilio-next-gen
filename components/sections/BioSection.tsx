@@ -18,7 +18,7 @@ export function BioSection() {
         {
           text: (
             <>
-              <span className="text-black font-bold">Alejandro Méndez</span>, nacido en Ojén (Málaga), DJ y productor especializado en la música House y sus diversas vertientes.
+              <span className="text-black font-bold">Alejandro Méndez</span>, en Ojén (Málaga), DJ y productor especializado en música House y sus diversas vertientes.
             </>
           )
         },
@@ -32,7 +32,7 @@ export function BioSection() {
         {
           text: (
             <>
-              Desde su debut a muy temprana edad en el <span className="italic border-b border-black/20">Festival Ojeando</span>, su trayectoria está por definirse; convencido de que la música tiene el poder de cambiarlo todo de la noche a la mañana.
+              Desde su debut a temprana edad en el <span className="italic border-b border-black/20">Festival Ojeando</span>, su trayectoria está por definirse; la música tiene el poder de cambiarlo todo de la noche a la mañana.
             </>
           )
         }
