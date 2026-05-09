@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { z } from "zod";
+import { motion, AnimatePresence } from "framer-motion";
 
 const DISPOSABLE_DOMAINS = [
   "temp-mail.org", "guerrillamail.com", "10minutemail.com", "yopmail.com",
@@ -178,8 +179,55 @@ export function ContactForm() {
         `}</style>
       </div>
       
-      {errorMsg && !emailError && <p className="text-red-600 text-sm">{errorMsg}</p>}
-      {status === "success" && <p className="text-green-600 text-sm">Message received.</p>}
+      <AnimatePresence>
+        {status === "success" && (
+          <motion.div 
+            initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            animate={{ opacity: 1, backdropFilter: "blur(10px)" }}
+            exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 text-black text-center p-8 rounded-lg"
+          >
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", damping: 15, stiffness: 200 }}
+              className="w-20 h-20 bg-black rounded-full flex items-center justify-center mb-6"
+            >
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </motion.div>
+            
+            <motion.h3 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-2xl font-display tracking-[0.2em] mb-4 uppercase"
+            >
+              INQUIRY RECEIVED
+            </motion.h3>
+            
+            <motion.p 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-[10px] tracking-[0.3em] uppercase opacity-50 mb-8 max-w-[280px] leading-loose"
+            >
+              Our management team will review your request with the highest priority. A confirmation email has been dispatched to your inbox.
+            </motion.p>
+
+            <motion.button
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              onClick={() => setStatus("idle")}
+              className="text-[10px] tracking-[0.4em] uppercase border-b border-black py-1 hover:opacity-50 transition-opacity"
+            >
+              CLOSE
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <button 
         type="submit" 

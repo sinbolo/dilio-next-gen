@@ -113,23 +113,50 @@ export function NotifyBanner({ isOpen, onClose, city }: NotifyBannerProps) {
                 </form>
               ) : (
                 <motion.div 
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex flex-col items-center justify-center py-6 text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex flex-col items-center justify-center py-10 text-center"
                 >
-                  <div className="w-12 h-12 rounded-full bg-[#22c55e]/20 flex items-center justify-center mb-4">
-                    <motion.div
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    </motion.div>
-                  </div>
-                  <h4 className="text-[#22c55e] font-display text-sm tracking-[0.3em] font-bold mb-1 uppercase">REQUEST RECEIVED</h4>
-                  <p className="text-white/40 text-[10px] uppercase tracking-widest font-mono">YOU WILL BE THE FIRST TO KNOW.</p>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", damping: 12, stiffness: 200, delay: 0.1 }}
+                    className="w-16 h-16 rounded-full border border-[#22c55e]/30 flex items-center justify-center mb-8 relative"
+                  >
+                    <motion.div 
+                      className="absolute inset-0 rounded-full bg-[#22c55e]/5"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </motion.div>
+                  
+                  <motion.h4 
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-[#22c55e] font-display text-base tracking-[0.4em] font-bold mb-3 uppercase"
+                  >
+                    ACCESS GRANTED
+                  </motion.h4>
+                  
+                  <motion.p 
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-white/40 text-[9px] uppercase tracking-[0.25em] font-mono max-w-[280px] leading-relaxed"
+                  >
+                    You have been successfully added to our elite circle. Expect exclusive intelligence shortly.
+                  </motion.p>
+
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: "40px" }}
+                    transition={{ delay: 0.6, duration: 0.8 }}
+                    className="h-[1px] bg-[#22c55e]/30 mt-8"
+                  />
                 </motion.div>
               )}
             </div>

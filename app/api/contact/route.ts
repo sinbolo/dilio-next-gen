@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { rateLimit } from '@/lib/rate-limit';
-import { getBookingEmailHtml } from '@/lib/email-templates';
+import { getBookingEmailHtml, getBookingConfirmationEmailHtml } from '@/lib/email-templates';
 
 const limiter = rateLimit({
   interval: 60 * 1000, 
@@ -34,8 +34,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, message: "Mock success (API Key missing)" }, { status: 200 });
     }
 
-    // Send email to Alejandro (Booking Notification)
-    const res = await fetch('https://api.resend.com/emails', {
+    // 1. Send email to DILIO Management (Booking Notification)
+    const adminRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -49,10 +49,32 @@ export async function POST(req: Request) {
       }),
     });
 
-    if (!res.ok) {
-      const error = await res.json();
-      console.error("Resend error:", error);
-      throw new Error("Failed to send booking email");
+    if (!adminRes.ok) {
+      const error = await adminRes.json();
+      console.error("Resend Admin Error:", error);
+      throw new Error("Failed to send admin notification");
+    }
+
+    // 2. Send professional confirmation to the Client
+    const clientRes = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'DILIO Management <onboarding@resend.dev>',
+        to: validatedData.email,
+        subject: 'Booking Inquiry Received - DILIO',
+        html: getBookingConfirmationEmailHtml(LOGO_URL, validatedData.message),
+      }),
+    });
+
+    if (!clientRes.ok) {
+      const error = await clientRes.json();
+      console.error("Resend Client Error:", error);
+      // We don't necessarily want to fail the whole request if only the client email fails, 
+      // but for "premium" experience, we should log it.
     }
 
     return NextResponse.json({ success: true }, { status: 200 });

@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         from: 'DILIO <onboarding@resend.dev>',
         to: validatedData.email,
-        subject: 'Bienvenido a DILIO',
+        subject: 'EXCLUSIVE ACCESS: DILIO THE SESSIONS',
         html: getWelcomeEmailHtml(LOGO_URL),
       }),
     });
