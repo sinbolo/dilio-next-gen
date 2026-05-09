@@ -215,7 +215,7 @@ export function CustomAudioPlayer() {
 
           <div 
             onClick={handleCue}
-            className="absolute bottom-[13.5%] left-[32.65%] w-[4.0%] aspect-square rounded-full cursor-pointer z-[300] border border-white/5 bg-black/10 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]"
+            className="absolute bottom-[13.5%] left-[32.65%] w-[4.5%] aspect-square rounded-full cursor-pointer z-[999] border border-white/5 bg-black/5 hover:bg-white/10 transition-all pointer-events-auto shadow-[inset_0_0_15px_rgba(0,0,0,0.6)]"
           >
             <AnimatePresence>
               {!isPlaying && !isConnecting && (
@@ -223,7 +223,7 @@ export function CustomAudioPlayer() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: [0.4, 1, 0.4] }}
                   transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0 rounded-full border-2 border-[#ffb300] shadow-[0_0_40px_rgba(255,179,0,0.8),0_0_15px_rgba(255,179,0,0.6),inset_0_0_15px_rgba(255,179,0,0.6)] bg-transparent"
+                  className="absolute inset-0 rounded-full border-2 border-[#ffb300] shadow-[0_0_40px_rgba(255,179,0,0.8),0_0_15px_rgba(255,179,0,0.6),inset_0_0_15px_rgba(255,179,0,0.6)] bg-transparent pointer-events-none"
                 />
               )}
             </AnimatePresence>
@@ -232,7 +232,7 @@ export function CustomAudioPlayer() {
 
           <div 
             onClick={handlePlayPause}
-            className="absolute bottom-[4.6%] left-[32.65%] w-[4.0%] aspect-square rounded-full cursor-pointer z-[300] border border-white/5 bg-black/10 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]"
+            className="absolute bottom-[4.6%] left-[32.65%] w-[4.5%] aspect-square rounded-full cursor-pointer z-[999] border border-white/5 bg-black/5 hover:bg-white/10 transition-all pointer-events-auto shadow-[inset_0_0_15px_rgba(0,0,0,0.6)]"
           >
             <AnimatePresence>
               {isPlaying && (
@@ -240,7 +240,7 @@ export function CustomAudioPlayer() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: [0.4, 1, 0.4] }}
                   transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0 rounded-full border-2 border-[#4ade80] shadow-[0_0_40px_rgba(74,222,128,0.8),0_0_15px_rgba(74,222,128,0.6),inset_0_0_15px_rgba(74,222,128,0.6)] bg-transparent"
+                  className="absolute inset-0 rounded-full border-2 border-[#4ade80] shadow-[0_0_40px_rgba(74,222,128,0.8),0_0_15px_rgba(74,222,128,0.6),inset_0_0_15px_rgba(74,222,128,0.6)] bg-transparent pointer-events-none"
                 />
               )}
             </AnimatePresence>
