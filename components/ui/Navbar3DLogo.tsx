@@ -35,20 +35,23 @@ export const Navbar3DLogo: React.FC<{ onClick?: () => void }> = ({ onClick }) =>
       const imageData = octx.getImageData(0, 0, offscreen.width, offscreen.height);
       const d = imageData.data;
       
-      // Precision Alpha-Cleaning for White Background integration
+      // Ultra-Precise Background Removal (Chroma-key style for #eeeeee)
       for (let i = 0; i < d.length; i += 4) {
         const r = d[i], g = d[i+1], b = d[i+2];
-        const brightness = (r + g + b) / 3;
         
-        // Target the #eeeeee background specifically (around 238 brightness)
-        // Anything above 225 becomes increasingly transparent
-        if (brightness > 225) {
-          d[i + 3] = Math.max(0, (255 - brightness) / 30 * 255);
-        } else {
-          // Boost the logo color slightly for a premium look
-          d[i] = Math.max(0, d[i] - 10);
-          d[i+1] = Math.max(0, d[i+1] - 5); // Preserve some green
-          d[i+2] = Math.max(0, d[i+2] - 10);
+        // Calculate distance to the target gray background (#eeeeee / 238, 238, 238)
+        const dist = Math.sqrt(Math.pow(r - 238, 2) + Math.pow(g - 238, 2) + Math.pow(b - 238, 2));
+        
+        // If the color is close to the background gray, make it transparent
+        // Using a tight threshold for absolute cleaning
+        if (dist < 60) {
+          d[i + 3] = Math.max(0, (dist - 15) / 45 * 255);
+        }
+        
+        // Further clean high-brightness pixels that are likely background
+        const brightness = (r + g + b) / 3;
+        if (brightness > 220) {
+          d[i + 3] = Math.min(d[i+3], Math.max(0, (255 - brightness) / 30 * 255));
         }
       }
       

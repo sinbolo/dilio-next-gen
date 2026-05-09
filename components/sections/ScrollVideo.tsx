@@ -110,11 +110,16 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
           const d = imageData.data;
           for (let i = 0; i < d.length; i += 4) {
             const r = d[i], g = d[i+1], b = d[i+2];
-            const brightness = (r + g + b) / 3;
             
-            // Targeted removal of the #eeeeee background
+            // Aggressive Background Removal for the big logo
+            const dist = Math.sqrt(Math.pow(r - 238, 2) + Math.pow(g - 238, 2) + Math.pow(b - 238, 2));
+            if (dist < 70) {
+              d[i + 3] = Math.max(0, (dist - 10) / 60 * 255);
+            }
+            
+            const brightness = (r + g + b) / 3;
             if (brightness > 225) {
-              d[i + 3] = Math.max(0, (255 - brightness) / 30 * 255);
+              d[i + 3] = Math.min(d[i+3], Math.max(0, (255 - brightness) / 30 * 255));
             }
           }
           ctx.putImageData(imageData, 0, 0);
