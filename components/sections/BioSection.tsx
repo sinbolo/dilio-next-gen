@@ -85,13 +85,30 @@ export function BioSection() {
 
           <div className="relative -top-40 md:top-0 h-32 md:h-64 mb-0 flex items-center justify-start ml-10 md:ml-12 z-0">
             <div className="relative h-full">
-              {/* Base Image (Off) - Always visible initially */}
+              {/* Base Image (Off) - Visible when "On" logo is off */}
               <motion.img 
                 src="/assets/logo_bio_off_clean.png"
                 className="h-full w-auto object-contain mix-blend-multiply relative left-2 md:left-0"
                 initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
+                whileInView={{ 
+                  opacity: [
+                    1, 1, 0, 1, 0, 0.7, 0, // Inverted Flicker
+                    0, 0,                   // Stay Off
+                    0, 1, 0.5, 1,           // Inverted Flicker Off
+                    1, 1                    // Stay On (as base)
+                  ]
+                }}
+                transition={{ 
+                  duration: 8.5,
+                  repeat: Infinity,
+                  times: [
+                    0, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, // Power On phase
+                    0.1, 0.53,                                // Stay On phase
+                    0.54, 0.55, 0.57, 0.59,                    // Power Off phase
+                    0.65, 1                                    // Stay Off phase
+                  ],
+                  ease: "easeInOut"
+                }}
               />
               
               {/* Active Image (On) - Infinite Loop: 4s ON / ~3.5s OFF */}
