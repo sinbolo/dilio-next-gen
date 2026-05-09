@@ -30,38 +30,30 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
   const frameIndex = useTransform(smoothProgress, [0, 1], [1, totalFrames], { clamp: true });
 
   // Load frames in background — never blocks render
-  // Load and render the FIRST frame immediately with absolute priority
   useEffect(() => {
-    const initLoad = async () => {
-      imagesRef.current = new Array(totalFrames).fill(null);
-      const firstImg = new Image();
-      const firstFrameNum = "001";
-      firstImg.src = `/video300_frames/frame_${firstFrameNum}.jpg`;
-      
-      await new Promise((resolve) => {
-        firstImg.onload = () => {
-          imagesRef.current[0] = firstImg;
-          setFramesLoaded(true);
-          resolve(null);
-        };
-        firstImg.onerror = () => {
-          setFramesLoaded(true); // Don't block even if first frame fails
-          resolve(null);
-        };
-      });
+    imagesRef.current = new Array(totalFrames).fill(null);
+    let loaded = 0;
+    const BATCH = 30; // Load first 30 frames immediately
 
-      // After first frame is visible, load the rest in the background
-      for (let i = 2; i <= totalFrames; i++) {
-        const img = new Image();
-        const frameNum = String(i).padStart(3, '0');
-        img.src = `/video300_frames/frame_${frameNum}.jpg`;
-        img.onload = () => {
-          imagesRef.current[i - 1] = img;
-        };
-      }
+    const loadFrame = (i: number) => {
+      const img = new Image();
+      const frameNum = String(i).padStart(3, '0');
+      img.src = `/video300_frames/frame_${frameNum}.jpg`;
+      img.onload = () => {
+        imagesRef.current[i - 1] = img;
+        loaded++;
+        if (loaded === BATCH) setFramesLoaded(true);
+      };
+      img.onerror = () => {
+        loaded++;
+        if (loaded === BATCH) setFramesLoaded(true);
+      };
     };
 
-    initLoad();
+    // Load ALL frames immediately for maximum speed as requested
+    for (let i = 1; i <= totalFrames; i++) {
+      loadFrame(i);
+    }
   }, [totalFrames]);
 
   // Render loop
@@ -82,12 +74,11 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
     let rafId: number;
 
     const render = () => {
-      if (!isInView) return;
-      
       const imgs = imagesRef.current;
       let current = Math.round(frameIndex.get());
       current = Math.max(1, Math.min(totalFrames, current));
 
+      // SKIP processing if we already rendered this frame
       if (current === lastIndexRef.current) {
         rafId = requestAnimationFrame(render);
         return;
@@ -108,10 +99,7 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const d = imageData.data;
             for (let i = 0; i < d.length; i += 4) {
-              // Precise integration for white background
-              if (d[i] > 230 && d[i + 1] > 230 && d[i + 2] > 230) {
-                d[i + 3] = 0;
-              }
+              if (d[i] > 230 && d[i + 1] > 230 && d[i + 2] > 230) d[i + 3] = 0;
             }
             ctx.putImageData(imageData, 0, 0);
           } catch { /* ignore cross-origin */ }
@@ -127,21 +115,17 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
   return (
     <div ref={containerRef} className="relative w-full h-[200vh]">
       <div className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden bg-white">
+        <canvas
+          ref={canvasRef}
+          className="w-[85vw] h-[85vh] md:w-[65vw] md:h-[65vh] object-contain -translate-y-8 md:translate-y-0"
+          style={{ opacity: framesLoaded ? 1 : 0, transition: 'opacity 0.6s ease-in-out' }}
+        />
         {/* Small non-blocking loader indicator — NOT fullscreen */}
         {!framesLoaded && (
           <div className="absolute inset-0 flex items-end justify-center pb-16 pointer-events-none">
             <div className="w-4 h-4 border-2 border-black/20 border-t-black/50 rounded-full animate-spin" />
           </div>
         )}
-
-        <canvas
-          ref={canvasRef}
-          className="w-[85vw] h-[85vh] md:w-[65vw] md:h-[65vh] object-contain -translate-y-8 md:translate-y-0"
-          style={{ 
-            opacity: framesLoaded ? 1 : 0, 
-            transition: 'opacity 0.6s ease-in-out'
-          }}
-        />
       </div>
     </div>
   );

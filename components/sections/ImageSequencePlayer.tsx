@@ -22,8 +22,6 @@ export function ImageSequencePlayer({
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isInView, setIsInView] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
 
   const frameIndexRef = useRef(0);
   const lastTimeRef = useRef(0);
@@ -59,20 +57,14 @@ export function ImageSequencePlayer({
       loadImage(i);
     }
 
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsInView(entry.isIntersecting),
-      { threshold: 0.1 }
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-
     return () => {
-      observer.disconnect();
+      // Cleanup if needed
     };
   }, [frameCount, basePath, extension]);
 
   // Animation Loop
   useEffect(() => {
-    if (isLoading || !isInView || images.length === 0 || !canvasRef.current) return;
+    if (isLoading || images.length === 0 || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -109,10 +101,30 @@ export function ImageSequencePlayer({
 
     const animId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animId);
-  }, [isLoading, isInView, images, frameCount, fps]);
+  }, [isLoading, images, frameCount, fps]);
 
   return (
-    <div ref={sectionRef} className={`relative w-full h-full flex items-center justify-center overflow-visible ${className}`}>
+    <div className={`relative w-full h-full flex items-center justify-center overflow-visible ${className}`}>
+      {isLoading && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white">
+          <div className="w-48 h-[1px] bg-black/5 rounded-full overflow-hidden mb-4">
+            <div 
+              className="h-full bg-black transition-all duration-300 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <span className="text-[10px] text-black/20 uppercase tracking-[0.4em] font-bold">
+            Loading Sequence // {progress}%
+          </span>
+        </div>
+      )}
+
+      {error && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center text-black/40 text-[10px] uppercase tracking-widest">
+          {error}
+        </div>
+      )}
+
       <canvas
         ref={canvasRef}
         className="w-full h-full object-contain transition-opacity duration-1000"

@@ -67,7 +67,7 @@ export function BioSection() {
   };
 
   return (
-    <section id="section-bio" className="min-h-0 md:min-h-screen relative flex items-start justify-center bg-[#ffffff] pt-0 pb-10 md:pb-40 overflow-hidden">
+    <section id="section-bio" className="min-h-0 md:min-h-screen relative flex items-start justify-center bg-white pt-0 pb-10 md:pb-40 overflow-hidden">
       <BioTutorial />
       {/* Background Subtle Gradient */}
 
@@ -88,7 +88,7 @@ export function BioSection() {
               {/* Base Image (Off) - Always visible initially */}
               <motion.img 
                 src="/assets/logo_bio_off_clean.png"
-                className="h-full w-auto object-contain mix-blend-multiply relative left-2 md:left-0 gpu-stabilize"
+                className="h-full w-auto object-contain mix-blend-multiply relative left-2 md:left-0"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
@@ -96,7 +96,7 @@ export function BioSection() {
               
               {/* Active Image (On) - Infinite Loop: 4s ON / ~3.5s OFF */}
               <motion.div 
-                className="absolute inset-0 gpu-stabilize"
+                className="absolute inset-0"
                 animate={{ 
                   opacity: [
                     0, 0, 1, 0, 1, 0.3, 1, // Power On Flicker (0.5s)
@@ -131,7 +131,7 @@ export function BioSection() {
               >
                 <img 
                   src="/assets/logo_bio_on_white_led.png"
-                  className="h-full w-auto object-contain mix-blend-multiply brightness-[1.15] contrast-[1.1] gpu-stabilize"
+                  className="h-full w-auto object-contain mix-blend-multiply brightness-[1.15] contrast-[1.1]"
                   alt="Dilio Logo Active"
                 />
               </motion.div>
