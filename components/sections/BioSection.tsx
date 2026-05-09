@@ -44,21 +44,21 @@ export function BioSection() {
         {
           text: (
             <>
-              <span className="text-black font-bold">Alejandro Méndez</span>, born in Ojén (Málaga), DJ and producer specializing in House music and its diverse styles.
+              <span className="text-black font-bold">Alejandro Méndez</span>, Ojén (Málaga), DJ and producer specializing in House music and its diverse styles.
             </>
           )
         },
         {
           text: (
             <>
-              His sound is fueled by the influence of icons like <span className="text-black/80">Axwell</span>, <span className="text-black/80">Dirty South</span>, and <span className="text-black/80">Fedde Le Grand</span>.
+              His sound is influenced by figures such as <span className="text-black/80">Axwell</span>, <span className="text-black/80">Dirty South</span>, and <span className="text-black/80">Fedde Le Grand</span>.
             </>
           )
         },
         {
           text: (
             <>
-              Since his early debut at the <span className="italic border-b border-black/20">Ojeando Festival</span>, his career is just beginning; driven by the certainty that music can change everything overnight.
+              Since his early debut at the <span className="italic border-b border-black/20">Ojeando Festival</span>, his career is just beginning; music has the power to change everything overnight.
             </>
           )
         }
