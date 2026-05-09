@@ -215,7 +215,7 @@ export function CustomAudioPlayer() {
 
           <div 
             onClick={handleCue}
-            className="absolute bottom-[13.5%] left-[32.65%] w-[4.0%] aspect-square rounded-full cursor-pointer z-[200] border border-white/5 bg-black/10 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]"
+            className="absolute bottom-[13.5%] left-[32.65%] w-[4.0%] aspect-square rounded-full cursor-pointer z-[300] border border-white/5 bg-black/10 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]"
           >
             <AnimatePresence>
               {!isPlaying && !isConnecting && (
@@ -232,7 +232,7 @@ export function CustomAudioPlayer() {
 
           <div 
             onClick={handlePlayPause}
-            className="absolute bottom-[4.6%] left-[32.65%] w-[4.0%] aspect-square rounded-full cursor-pointer z-[200] border border-white/5 bg-black/10 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]"
+            className="absolute bottom-[4.6%] left-[32.65%] w-[4.0%] aspect-square rounded-full cursor-pointer z-[300] border border-white/5 bg-black/10 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]"
           >
             <AnimatePresence>
               {isPlaying && (
