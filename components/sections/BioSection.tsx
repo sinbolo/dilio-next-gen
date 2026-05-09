@@ -168,7 +168,7 @@ export function BioSection() {
                     ? 'linear-gradient(90deg, rgba(255, 0, 0, 0.5) 0%, rgba(255, 200, 0, 0.7) 50%, rgba(255, 0, 0, 0.5) 100%)'
                     : 'linear-gradient(90deg, rgba(0, 80, 255, 0.5) 0%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 0, 0, 0.5) 100%)'
                 }}
-                className="absolute inset-0 opacity-100 blur-md"
+                className="absolute inset-0 opacity-100 blur-md rounded-full"
               />
               
               <div className="relative flex items-center gap-2 z-10">
