@@ -106,10 +106,11 @@ export function MerchTutorial() {
   const { scrollY } = useScroll();
   const [hasPassedHero, setHasPassedHero] = useState(false);
   const ref = useRef(null);
-  const inView = useInView(ref, { amount: 0.6 });
+  const inView = useInView(ref, { amount: 0.1 });
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    setHasPassedHero(latest > 800);
+    const threshold = isMobile ? 400 : 800;
+    setHasPassedHero(latest > threshold);
   });
 
   useEffect(() => {
@@ -220,7 +221,7 @@ export function MerchTutorial() {
                   transition={{ duration: 1.5 }}
                   className="relative"
                 >
-                  <div className={`relative z-10 font-sketch ${isMobile ? 'text-[12px]' : 'text-[8px] md:text-sm'} uppercase tracking-widest italic`} style={fireTextStyle}>
+                  <div className={`relative z-10 font-sketch ${isMobile ? 'text-[10px]' : 'text-[8px] md:text-sm'} uppercase tracking-widest italic`} style={fireTextStyle}>
                     <AnimatePresence mode="wait">
                       <motion.div key={lang} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                         {isMobile 
@@ -247,7 +248,7 @@ export function MerchTutorial() {
                   transition={{ duration: 1.5, delay: 0.5 }}
                   className="relative"
                 >
-                  <div className={`relative z-10 font-sketch ${isMobile ? 'text-[12px]' : 'text-[8px] md:text-sm'} uppercase tracking-widest italic ${isMobile ? 'text-center' : 'text-right'}`} style={fireTextStyle}>
+                  <div className={`relative z-10 font-sketch ${isMobile ? 'text-[10px]' : 'text-[8px] md:text-sm'} uppercase tracking-widest italic ${isMobile ? 'text-center' : 'text-right'}`} style={fireTextStyle}>
                     <AnimatePresence mode="wait">
                       <motion.div key={lang} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                         {lang === 'en' ? "Explore the shadows." : "Explora las sombras."}
