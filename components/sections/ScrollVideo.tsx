@@ -109,15 +109,12 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const d = imageData.data;
           for (let i = 0; i < d.length; i += 4) {
-            // Invert colors to make the logo light on a dark background
-            d[i] = 255 - d[i];
-            d[i+1] = 255 - d[i+1];
-            d[i+2] = 255 - d[i+2];
-
-            const brightness = (d[i] + d[i+1] + d[i+2]) / 3;
-            // Clear the new dark background
-            if (brightness < 45) {
-              d[i+3] = 0;
+            const r = d[i], g = d[i+1], b = d[i+2];
+            const brightness = (r + g + b) / 3;
+            
+            // Targeted removal of the #eeeeee background
+            if (brightness > 225) {
+              d[i + 3] = Math.max(0, (255 - brightness) / 30 * 255);
             }
           }
           ctx.putImageData(imageData, 0, 0);
@@ -156,8 +153,7 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
           className="w-[85vw] h-[85vh] md:w-[65vw] md:h-[65vh] object-contain -translate-y-8 md:translate-y-0"
           style={{ 
             opacity: framesLoaded ? 1 : 0, 
-            transition: 'opacity 0.6s ease-in-out',
-            filter: 'contrast(1.15) brightness(1.1) drop-shadow(0 0 30px rgba(0,0,0,0.5))'
+            transition: 'opacity 0.6s ease-in-out'
           }}
         />
       </div>
