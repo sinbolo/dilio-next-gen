@@ -92,10 +92,10 @@ export function BioSection() {
                 initial={{ opacity: 0 }}
                 whileInView={{ 
                   opacity: [
-                    1, 1, 0, 1, 0, 0.7, 0, // Inverted Flicker
-                    0, 0,                   // Stay Off
-                    0, 1, 0.5, 1,           // Inverted Flicker Off
-                    1, 1                    // Stay On (as base)
+                    1, 1, 0, 1, 0, 0, 0, // Strictly Off when On flickers
+                    0, 0,                // Stay Off when On is on
+                    0, 1, 0, 1,          // Strictly Off when On flickers off
+                    1, 1                 // Stay On (as base) when On is off
                   ]
                 }}
                 transition={{ 
