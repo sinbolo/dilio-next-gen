@@ -18,7 +18,7 @@ export function BioSection() {
         {
           text: (
             <>
-              <span className="text-black font-bold">Alejandro Méndez</span>, en Ojén (Málaga), DJ y productor especializado en música House y sus diversas vertientes.
+              <span className="text-black font-bold">Alejandro Méndez</span>, Ojén (Málaga), DJ y productor especializado en música House y sus diversas vertientes.
             </>
           )
         },
