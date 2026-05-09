@@ -37,22 +37,9 @@ export const Navbar3DLogo: React.FC<{ onClick?: () => void }> = ({ onClick }) =>
       
       // Ultra-Precise Background Removal (Chroma-key style for #eeeeee)
       for (let i = 0; i < d.length; i += 4) {
-        const r = d[i], g = d[i+1], b = d[i+2];
-        
-        // Calculate distance to the target gray background (#eeeeee / 238, 238, 238)
-        const dist = Math.sqrt(Math.pow(r - 238, 2) + Math.pow(g - 238, 2) + Math.pow(b - 238, 2));
-        
-        // If the color is close to the background gray, make it transparent
-        // Using a tight threshold for absolute cleaning
-        if (dist < 60) {
-          d[i + 3] = Math.max(0, (dist - 15) / 45 * 255);
-        }
-        
-        // Further clean high-brightness pixels that are likely background
-        const brightness = (r + g + b) / 3;
-        if (brightness > 220) {
-          d[i + 3] = Math.min(d[i+3], Math.max(0, (255 - brightness) / 30 * 255));
-        }
+        const brightness = (d[i] + d[i + 1] + d[i + 2]) / 3;
+        if (brightness > 235) d[i + 3] = 0;
+        else if (brightness > 220) d[i + 3] = ((235 - brightness) / 15) * 255;
       }
       
       octx.putImageData(imageData, 0, 0);
@@ -66,43 +53,21 @@ export const Navbar3DLogo: React.FC<{ onClick?: () => void }> = ({ onClick }) =>
     imagesRef.current = new Array(totalFrames).fill(null);
 
     const loadAndProcess = (i: number) => {
-      return new Promise<void>((resolve) => {
-        if (imagesRef.current[i - 1]) {
-          resolve();
-          return;
-        }
-        const img = new Image();
-        const num = String(i).padStart(3, '0');
-        img.src = `/frames-menu/frame_${num}.jpg`;
-        img.onload = () => {
-          imagesRef.current[i - 1] = img;
-          processImage(img, i);
-          resolve();
-        };
-        img.onerror = () => resolve(); // Don't block if one frame fails
-      });
+      if (imagesRef.current[i - 1]) return;
+      const img = new Image();
+      const num = String(i).padStart(3, '0');
+      img.src = `/frames-menu/frame_${num}.jpg`;
+      img.onload = () => {
+        imagesRef.current[i - 1] = img;
+        processImage(img, i);
+      };
     };
 
-    // Load and process frames with priority for the first one
-    const loadAll = async () => {
-      // 1. Load and render the FIRST frame immediately
-      await loadAndProcess(1);
-      setFirstFrameReady(true);
-
-      // 2. Load the rest in larger batches for speed
-      const remainingFrames = Array.from({ length: totalFrames - 1 }, (_, i) => i + 2);
-      const batchSize = 10;
-      
-      for (let i = 0; i < remainingFrames.length; i += batchSize) {
-        const batch = remainingFrames.slice(i, i + batchSize).map(num => loadAndProcess(num));
-        await Promise.all(batch);
-        // Give the UI a tiny bit of time to breathe
-        await new Promise(resolve => setTimeout(resolve, 10));
-      }
-    };
-
-    loadAll();
-  }, [loadAndProcess, totalFrames]);
+    // Load ALL frames immediately
+    for (let i = 1; i <= totalFrames; i++) {
+      loadAndProcess(i);
+    }
+  }, [processImage]);
 
   const lastRenderedIndex = useRef<number>(-1);
   const renderFrame = (index: number) => {
@@ -150,8 +115,7 @@ export const Navbar3DLogo: React.FC<{ onClick?: () => void }> = ({ onClick }) =>
         className="w-full h-full object-contain"
         style={{ 
           opacity: firstFrameReady ? 1 : 0, 
-          transition: 'opacity 0.4s ease-in-out',
-          filter: 'contrast(1.2) brightness(1.15) drop-shadow(0 0 5px rgba(255,255,255,0.05))',
+          transition: 'opacity 0.3s ease-in-out',
           willChange: 'transform'
         }}
       />

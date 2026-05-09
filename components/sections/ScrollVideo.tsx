@@ -97,32 +97,24 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
       const img = imgs[current - 1];
       const canvas = canvasRef.current;
       if (canvas && img?.complete && img.naturalWidth > 0) {
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const ctx = canvas.getContext('2d', { willReadFrequently: false });
         if (ctx) {
           if (canvas.width !== img.naturalWidth) {
             canvas.width = img.naturalWidth;
             canvas.height = img.naturalHeight;
           }
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const d = imageData.data;
-          for (let i = 0; i < d.length; i += 4) {
-            const r = d[i], g = d[i+1], b = d[i+2];
-            
-            // Aggressive Background Removal for the big logo
-            const dist = Math.sqrt(Math.pow(r - 238, 2) + Math.pow(g - 238, 2) + Math.pow(b - 238, 2));
-            if (dist < 70) {
-              d[i + 3] = Math.max(0, (dist - 10) / 60 * 255);
+          ctx.drawImage(img, 0, -10, canvas.width, canvas.height + 10);
+          try {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const d = imageData.data;
+            for (let i = 0; i < d.length; i += 4) {
+              // Precise integration for white background
+              if (d[i] > 230 && d[i + 1] > 230 && d[i + 2] > 230) {
+                d[i + 3] = 0;
+              }
             }
-            
-            const brightness = (r + g + b) / 3;
-            if (brightness > 225) {
-              d[i + 3] = Math.min(d[i+3], Math.max(0, (255 - brightness) / 30 * 255));
-            }
-          }
-          ctx.putImageData(imageData, 0, 0);
+            ctx.putImageData(imageData, 0, 0);
+          } catch { /* ignore cross-origin */ }
         }
       }
       rafId = requestAnimationFrame(render);
@@ -134,22 +126,11 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
 
   return (
     <div ref={containerRef} className="relative w-full h-[200vh]">
-      <div className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden bg-transparent">
-        {/* Instant Placeholder */}
+      <div className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden bg-white">
+        {/* Small non-blocking loader indicator — NOT fullscreen */}
         {!framesLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <img 
-              src="/video300_frames/frame_001.jpg"
-              alt=""
-              {...{ fetchPriority: "high" } as any}
-              style={{
-                width: '85vw',
-                height: '85vh',
-                objectFit: 'contain',
-                opacity: 0.1
-              }}
-              className="md:w-[65vw] md:h-[65vh] -translate-y-8 md:translate-y-0"
-            />
+          <div className="absolute inset-0 flex items-end justify-center pb-16 pointer-events-none">
+            <div className="w-4 h-4 border-2 border-black/20 border-t-black/50 rounded-full animate-spin" />
           </div>
         )}
 

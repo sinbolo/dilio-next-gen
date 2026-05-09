@@ -31,7 +31,7 @@ const videos = [
   { 
     id: "placeholder1", 
     title: "MIAMI DJ SET",
-    thumbnail: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2070&auto=format&fit=crop",
+    thumbnail: "",
     channel: "Dilio",
     views: "∞",
     time: "Future",
@@ -40,7 +40,7 @@ const videos = [
   { 
     id: "placeholder2", 
     title: "TOMORROWLAND",
-    thumbnail: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2070&auto=format&fit=crop",
+    thumbnail: "",
     channel: "Dilio",
     views: "∞",
     time: "Future",
@@ -497,8 +497,15 @@ export function VideoGrid() {
                       <h3 className="font-bold text-lg mb-1 hidden xl:block mt-2">Up next</h3>
                       {videos.map(vid => (
                         <div key={vid.id} className="flex gap-3 group cursor-pointer" onClick={() => { setActiveVideo(vid); setIsPlaying(false); playStartRef.current = null; }}>
-                          <div className="w-[160px] aspect-video rounded-lg overflow-hidden relative shrink-0 bg-[#222]">
-                            <img src={vid.thumbnail} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          <div className="w-[160px] aspect-video rounded-lg overflow-hidden relative shrink-0 bg-[#1a1a1a]">
+                            {vid.thumbnail ? (
+                              <img src={vid.thumbnail} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-[#111]">
+                                <PlaySquare className="w-6 h-6 text-white/10" />
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-50"></div>
+                              </div>
+                            )}
                             <div className="absolute bottom-1 right-1 bg-black/80 px-1.5 py-0.5 rounded text-[10px] font-medium">{vid.duration}</div>
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100"><Play className="w-6 h-6 fill-white drop-shadow-lg" /></div>
                           </div>
@@ -518,8 +525,21 @@ export function VideoGrid() {
                   <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8">
                     {videos.map((vid) => (
                       <div key={vid.id} className="flex flex-col gap-3 group cursor-pointer" onClick={() => { setActiveVideo(vid); setIsPlaying(false); playStartRef.current = null; setIsPip(false); setPipDismissed(false); }}>
-                        <div className="relative aspect-video rounded-xl overflow-hidden bg-[#222]">
-                          <img src={vid.thumbnail} alt={vid.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        <div className="relative aspect-video rounded-xl overflow-hidden bg-[#1a1a1a]">
+                          {vid.thumbnail ? (
+                            <img src={vid.thumbnail} alt={vid.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          ) : (
+                            <div className="w-full h-full flex flex-col items-center justify-center bg-[#111] relative overflow-hidden">
+                              <PlaySquare className="w-12 h-12 text-white/5 mb-2" />
+                              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_0%,transparent_70%)]"></div>
+                              {/* Animated loading pulse line */}
+                              <motion.div 
+                                animate={{ x: ['-100%', '200%'] }} 
+                                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/[0.03] to-transparent skew-x-[-20deg]"
+                              />
+                            </div>
+                          )}
                           <div className="absolute bottom-1.5 right-1.5 bg-black/80 px-1.5 py-0.5 rounded text-xs font-medium">{vid.duration}</div>
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
                             <div className="w-12 h-12 bg-black/60 rounded-full flex items-center justify-center backdrop-blur-md"><Play className="w-5 h-5 fill-white ml-1" /></div>
