@@ -159,7 +159,8 @@ export function BioSection() {
           <div className="mb-10 -mt-40 md:-mt-12 relative z-20 flex justify-center md:justify-start md:ml-12">
             <button 
               onClick={toggleLang}
-              className="flex items-center gap-2 px-4 py-1.5 bg-black/5 border border-black/5 rounded-full hover:bg-black/10 transition-all group relative overflow-hidden"
+              className="flex items-center gap-2 px-4 py-1.5 bg-black/5 border border-black/5 rounded-full hover:bg-black/10 transition-all group relative overflow-hidden isolate"
+              style={{ transform: 'translateZ(0)', clipPath: 'inset(0 round 9999px)' }}
             >
               {/* Background Glow - More Intense */}
               <motion.div 
