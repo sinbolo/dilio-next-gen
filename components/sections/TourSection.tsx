@@ -87,7 +87,7 @@ export function TourSection() {
       {/* Help Button - Now conditionally visible based on section view and scroll position */}
       <AnimatePresence>
         {isInView && hasPassedHero && (
-          <div className={`fixed ${isMobile ? 'bottom-24 left-6' : 'bottom-12 left-12'} z-[1000] flex flex-col items-start gap-2`}>
+          <div className={`fixed ${isMobile ? 'bottom-4 left-6' : 'bottom-12 left-12'} z-[1000] flex flex-col items-start gap-2`}>
             <motion.button
               initial={{ opacity: 0, x: -20, scale: 0.8 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}

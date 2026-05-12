@@ -33,7 +33,7 @@ export function HolographicHelp({ onClick }: { onClick: () => void }) {
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className="fixed left-2 md:left-8 bottom-0 md:bottom-8 z-[110] pointer-events-auto group"
+      className="fixed left-8 bottom-8 z-[110] pointer-events-auto group"
     >
       {/* Iridescent Foil Sticker Base (Micro-Jewelry Scale) */}
       <div className="relative w-8 h-8 flex items-center justify-center rounded-full overflow-hidden shadow-[0_4px_10px_rgba(0,0,0,0.6)] border-[0.3px] border-white/30">
