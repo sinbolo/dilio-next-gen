@@ -77,7 +77,7 @@ export function CreativeNavigation() {
           alt="Creative Background"
           fill
           className="object-cover object-[center_25%] opacity-90 blur-[2px] scale-[1.02]"
-          priority
+          loading="lazy"
           quality={90}
         />
         {/* Cinematic vignette overlay for depth */}
@@ -111,7 +111,8 @@ export function CreativeNavigation() {
               top: folder.top,
               left: (folder as any).left,
               right: (folder as any).right,
-              willChange: "transform, opacity"
+              willChange: "transform, opacity",
+              transform: "translate3d(0,0,0)"
             }}
           >
             <motion.a

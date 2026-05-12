@@ -575,7 +575,7 @@ export function MerchGallery() {
           fill 
           sizes="100vw"
           className="object-cover opacity-80 mix-blend-screen scale-110"
-          priority
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black opacity-90" />
       </div>
