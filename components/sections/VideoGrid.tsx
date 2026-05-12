@@ -265,7 +265,7 @@ export function VideoGrid() {
 
         {/* Floating iPad Mockup */}
         <div 
-          className="relative w-full max-w-[1200px] aspect-[9/42] md:aspect-[16/10] bg-[#1a1a1a] rounded-[2rem] md:rounded-[3rem] p-3 md:p-[22px] shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_30px_60px_rgba(0,0,0,0.8),inset_0_0_0_2px_#333,inset_0_0_20px_rgba(0,0,0,1)] ring-1 ring-black"
+          className="relative w-full max-w-[1200px] aspect-[9/16] md:aspect-[16/10] bg-[#1a1a1a] rounded-[2rem] md:rounded-[3rem] p-3 md:p-[22px] shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_30px_60px_rgba(0,0,0,0.8),inset_0_0_0_2px_#333,inset_0_0_20px_rgba(0,0,0,1)] ring-1 ring-black"
         >
           {/* Metallic Edge Highlight */}
           <div className="absolute inset-0 rounded-[2rem] md:rounded-[3rem] shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] pointer-events-none"></div>

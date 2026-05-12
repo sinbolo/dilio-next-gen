@@ -252,16 +252,14 @@ export function CustomAudioPlayer() {
         <div className="relative w-[180vw] md:w-full left-1/2 md:left-auto ml-[-90vw] md:ml-0 aspect-[16/9] max-h-[800px] bg-white overflow-visible flex items-center justify-center">
           <div className="relative w-full h-full">
         
-        {/* Hardware Base Image (Only render when in view to save RAM) */}
-        {isInView && (
-          <Image
-            src="/assets/reproductor-web.png"
-            alt="CDJ-3000 Hardware"
-            fill
-            className="object-contain p-[1.71%] md:p-6"
-            loading="lazy"
-          />
-        )}
+        {/* Hardware Base Image */}
+        <Image
+          src="/assets/reproductor-web.png"
+          alt="CDJ-3000 Hardware"
+          fill
+          className="object-contain p-[1.71%] md:p-6"
+          priority
+        />
 
         {/* --- LCD SCREEN OVERLAY --- */}
         <div 
@@ -484,7 +482,7 @@ export function CustomAudioPlayer() {
         </div>
 
         {/* --- USB SELECTION MENU --- */}
-                <div className="absolute top-[25%] md:left-[16.5%] left-[23.5%] w-[10%] h-[30%] flex flex-col gap-[15%] z-[100] scale-[0.65] md:scale-100 origin-left">
+        <div className="absolute top-[25%] md:left-[16.5%] left-[23.5%] w-[10%] h-[30%] flex flex-col gap-[15%] z-[100] scale-[0.65] md:scale-100 origin-left">
           <div className="relative h-[45%] flex items-center justify-center">
             <motion.div
               onClick={() => handleUsbClick(1)}
@@ -500,20 +498,6 @@ export function CustomAudioPlayer() {
               />
             </motion.div>
           </div>
-          
-          {/* Waveform Visualization (Dynamic & High-Fidelity) */}
-          <div className="absolute top-[28%] left-[6.4%] right-[6.4%] h-[32%] overflow-hidden">
-            {isInView && (
-              <canvas 
-                ref={canvasRef}
-                width={1200}
-                height={300}
-                className="w-full h-full opacity-90 filter drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-                style={{ mixBlendMode: 'screen' }}
-              />
-            )}
-          </div>
-
           <div className="relative h-[45%] flex items-center justify-center">
             <motion.div
               onClick={() => handleUsbClick(2)}
@@ -526,129 +510,127 @@ export function CustomAudioPlayer() {
         </div>
 
         {/* --- HARDWARE BUTTONS OVERLAYS --- */}
-        {isInView && (
-          <>
-            {/* CUE Button Overlay - Physical Round Button Look */}
-            <div 
-              onClick={() => {
-                if (isConnecting) return;
-                widgetRef.current?.pause();
-                widgetRef.current?.seekTo(0);
-                setIsPlaying(false);
-              }}
-              className="absolute bottom-[13.5%] left-[32.65%] w-[4.0%] aspect-square rounded-full cursor-pointer z-[200] border border-white/5 bg-black/10 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]"
-              title="CUE"
-            >
-              {/* CUE Light (Amber) - Faster Blinking Animation */}
-              <AnimatePresence>
-                {!isPlaying && !isConnecting && (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: [0.4, 1, 0.4] }}
-                    transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute inset-0 rounded-full border-2 border-[#ffb300] shadow-[0_0_40px_rgba(255,179,0,0.8),0_0_15px_rgba(255,179,0,0.6),inset_0_0_15px_rgba(255,179,0,0.6)] bg-transparent"
-                  />
-                )}
-              </AnimatePresence>
-              {/* Physical Rim Effect */}
-              <div className="absolute inset-0 rounded-full border-[1.5px] border-white/10 pointer-events-none" />
-            </div>
+        
+        {/* CUE Button Overlay - Physical Round Button Look */}
+        <div 
+          onClick={() => {
+            if (isConnecting) return;
+            widgetRef.current?.pause();
+            widgetRef.current?.seekTo(0);
+            setIsPlaying(false);
+          }}
+          className="absolute bottom-[13.5%] left-[32.65%] w-[4.0%] aspect-square rounded-full cursor-pointer z-[200] border border-white/5 bg-black/10 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]"
+          title="CUE"
+        >
+          {/* CUE Light (Amber) - Faster Blinking Animation */}
+          <AnimatePresence>
+            {!isPlaying && !isConnecting && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0.4, 1, 0.4] }}
+                transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-0 rounded-full border-2 border-[#ffb300] shadow-[0_0_40px_rgba(255,179,0,0.8),0_0_15px_rgba(255,179,0,0.6),inset_0_0_15px_rgba(255,179,0,0.6)] bg-transparent"
+              />
+            )}
+          </AnimatePresence>
+          {/* Physical Rim Effect */}
+          <div className="absolute inset-0 rounded-full border-[1.5px] border-white/10 pointer-events-none" />
+        </div>
 
-            {/* PLAY/PAUSE Button Overlay - Physical Round Button Look */}
-            <div 
-              onClick={() => {
-                if (isConnecting) return;
-                if (isPlaying) {
-                  widgetRef.current?.pause();
-                } else {
-                  widgetRef.current?.play();
-                }
-              }}
-              className="absolute bottom-[4.6%] left-[32.65%] w-[4.0%] aspect-square rounded-full cursor-pointer z-[200] border border-white/5 bg-black/10 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]"
-              title="PLAY / PAUSE"
-            >
-              {/* PLAY Light (Green) - Faster Blinking Animation */}
-              <AnimatePresence>
-                {isPlaying && (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: [0.4, 1, 0.4] }}
-                    transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute inset-0 rounded-full border-2 border-[#4ade80] shadow-[0_0_40px_rgba(74,222,128,0.8),0_0_15px_rgba(74,222,128,0.6),inset_0_0_15px_rgba(74,222,128,0.6)] bg-transparent"
-                  />
-                )}
-              </AnimatePresence>
-              {/* Physical Rim Effect */}
-              <div className="absolute inset-0 rounded-full border-[1.5px] border-white/10 pointer-events-none" />
-            </div>
+        {/* PLAY/PAUSE Button Overlay - Physical Round Button Look */}
+        <div 
+          onClick={() => {
+            if (isConnecting) return;
+            if (isPlaying) {
+              widgetRef.current?.pause();
+            } else {
+              widgetRef.current?.play();
+            }
+          }}
+          className="absolute bottom-[4.6%] left-[32.65%] w-[4.0%] aspect-square rounded-full cursor-pointer z-[200] border border-white/5 bg-black/10 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]"
+          title="PLAY / PAUSE"
+        >
+          {/* PLAY Light (Green) - Faster Blinking Animation */}
+          <AnimatePresence>
+            {isPlaying && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0.4, 1, 0.4] }}
+                transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-0 rounded-full border-2 border-[#4ade80] shadow-[0_0_40px_rgba(74,222,128,0.8),0_0_15px_rgba(74,222,128,0.6),inset_0_0_15px_rgba(74,222,128,0.6)] bg-transparent"
+              />
+            )}
+          </AnimatePresence>
+          {/* Physical Rim Effect */}
+          <div className="absolute inset-0 rounded-full border-[1.5px] border-white/10 pointer-events-none" />
+        </div>
 
-            {/* --- JOG WHEEL DYNAMIC CENTER --- */}
-            <div className="absolute top-[69.5%] left-[50.0%] w-[5.5%] md:w-[4.5%] aspect-square -translate-x-1/2 -translate-y-1/2 z-[90] pointer-events-none">
-              {/* Jog Ring / Outer Circle */}
-              <div className="absolute inset-0 rounded-full border-2 border-white/5 bg-black/40 shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] overflow-hidden">
-                {/* Waiting for logo-jog-new.png to be saved in /public/assets/ */}
-              </div>
-              
-              {/* --- NEW: Four Corner Green LEDs around the Jog --- */}
-              <AnimatePresence>
-                {isPlaying && (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-[-100%] rounded-full pointer-events-none -translate-y-[10%] -translate-x-[5%]"
-                  >
-                    {/* Subtle Containing Ring */}
-                    <div className="absolute inset-0 rounded-full border border-[#4ade80]/10 shadow-[inset_0_0_15px_rgba(74,222,128,0.05)]" />
-                    
-                    {[
-                      { top: '0%', left: '0%' },   // TL
-                      { top: '2%', left: '95%' },   // TR (Moved up and right)
-                      { top: '100%', left: '0%' }, // BL
-                      { top: '90%', left: '90%' }  // BR (Moved up and right)
-                    ].map((pos, i) => (
-                      <motion.div 
-                        key={`jog-led-${i}`}
-                        animate={{ opacity: [0.1, 1, 0.1], scale: [0.9, 1.1, 0.9] }}
-                        transition={{ duration: 0.5, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute w-[20%] h-[20%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#4ade80]/40 shadow-[0_0_15px_#4ade80,0_0_50px_rgba(74,222,128,0.6),0_0_100px_rgba(74,222,128,0.3)] z-[100] blur-[2px]"
-                        style={pos}
-                      />
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              
-              {/* Rotating Marker (Pioneer style) - Pauses where it is, resets on USB change */}
-              <div 
-                key={`jog-marker-${activeUsb}`}
-                className="absolute inset-0 rounded-full"
-                style={{ 
-                  animation: 'jog-rotate 1.8s linear infinite',
-                  animationPlayState: isPlaying ? 'running' : 'paused'
-                }}
+        {/* --- JOG WHEEL DYNAMIC CENTER --- */}
+        <div className="absolute top-[69.5%] left-[50.0%] w-[5.5%] md:w-[4.5%] aspect-square -translate-x-1/2 -translate-y-1/2 z-[90] pointer-events-none">
+          {/* Jog Ring / Outer Circle */}
+          <div className="absolute inset-0 rounded-full border-2 border-white/5 bg-black/40 shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] overflow-hidden">
+            {/* Waiting for logo-jog-new.png to be saved in /public/assets/ */}
+
+          </div>
+          
+          {/* --- NEW: Four Corner Green LEDs around the Jog --- */}
+          <AnimatePresence>
+            {isPlaying && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-[-100%] rounded-full pointer-events-none -translate-y-[10%] -translate-x-[5%]"
               >
-                {/* The white "needle" marker - Bigger */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[3%] h-[50%] bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] rounded-full" />
-              </div>
+                {/* Subtle Containing Ring */}
+                <div className="absolute inset-0 rounded-full border border-[#4ade80]/10 shadow-[inset_0_0_15px_rgba(74,222,128,0.05)]" />
+                
+                {[
+                  { top: '0%', left: '0%' },   // TL
+                  { top: '2%', left: '95%' },   // TR (Moved up and right)
+                  { top: '100%', left: '0%' }, // BL
+                  { top: '90%', left: '90%' }  // BR (Moved up and right)
+                ].map((pos, i) => (
+                  <motion.div 
+                    key={`jog-led-${i}`}
+                    animate={{ opacity: [0.1, 1, 0.1], scale: [0.9, 1.1, 0.9] }}
+                    transition={{ duration: 0.5, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute w-[20%] h-[20%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#4ade80]/40 shadow-[0_0_15px_#4ade80,0_0_50px_rgba(74,222,128,0.6),0_0_100px_rgba(74,222,128,0.3)] z-[100] blur-[2px]"
+                    style={pos}
+                  />
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* Rotating Marker (Pioneer style) - Pauses where it is, resets on USB change */}
+          <div 
+            key={`jog-marker-${activeUsb}`}
+            className="absolute inset-0 rounded-full"
+            style={{ 
+              animation: 'jog-rotate 1.8s linear infinite',
+              animationPlayState: isPlaying ? 'running' : 'paused'
+            }}
+          >
+            {/* The white "needle" marker - Bigger */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[3%] h-[50%] bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] rounded-full" />
+          </div>
 
-              {/* Inner Shadow / Depth */}
-              <div className="absolute inset-0 rounded-full shadow-[inset_0_0_40px_rgba(0,0,0,1)] pointer-events-none" />
-            </div>
+          {/* Inner Shadow / Depth */}
+          <div className="absolute inset-0 rounded-full shadow-[inset_0_0_40px_rgba(0,0,0,1)] pointer-events-none" />
+        </div>
 
-            {/* TRACK SEARCH Buttons */}
-            <div 
-              onClick={handleNextTrack}
-              className="absolute bottom-[31.5%] left-[28.5%] w-[3.5%] h-[3.5%] rounded-md cursor-pointer z-[100] hover:bg-white/5"
-              title="Next Track"
-            />
-            <div 
-              onClick={handlePrevTrack}
-              className="absolute bottom-[31.5%] left-[25.8%] w-[3.5%] h-[3.5%] rounded-md cursor-pointer z-[100] hover:bg-white/5"
-              title="Prev Track"
-            />
-          </>
-        )}
+        {/* TRACK SEARCH Buttons */}
+        <div 
+          onClick={handleNextTrack}
+          className="absolute bottom-[31.5%] left-[28.5%] w-[3.5%] h-[3.5%] rounded-md cursor-pointer z-[100] hover:bg-white/5"
+          title="Next Track"
+        />
+        <div 
+          onClick={handlePrevTrack}
+          className="absolute bottom-[31.5%] left-[25.8%] w-[3.5%] h-[3.5%] rounded-md cursor-pointer z-[100] hover:bg-white/5"
+          title="Prev Track"
+        />
 
         {/* --- CINEMATIC PLUG-IN ANIMATION --- */}
         <AnimatePresence>
