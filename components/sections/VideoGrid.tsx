@@ -88,6 +88,7 @@ export function VideoGrid({ onPipChange }: VideoGridProps = {}) {
   const isPlayingRef = useRef(false);
   const playStartRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const trackerRef = useRef<HTMLDivElement>(null);
   const videoSlotRef = useRef<HTMLDivElement>(null);
   const portalRef = useRef<HTMLDivElement>(null);
   const videoPosRef = useRef({ top: 0, left: 0, width: 0, height: 0 });
@@ -134,11 +135,11 @@ export function VideoGrid({ onPipChange }: VideoGridProps = {}) {
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          if (!containerRef.current) {
+          if (!trackerRef.current) {
             ticking = false;
             return;
           }
-          const rect = containerRef.current.getBoundingClientRect();
+          const rect = trackerRef.current.getBoundingClientRect();
           const isOutOfView = rect.bottom < 150 || rect.top > window.innerHeight - 150;
           
           if (isOutOfView) {
@@ -441,6 +442,7 @@ export function VideoGrid({ onPipChange }: VideoGridProps = {}) {
 
               {/* Dynamic Content */}
               <div className="flex-1 overflow-y-auto custom-scrollbar relative">
+                <div ref={trackerRef} className="absolute top-0 left-0 w-full h-[300px] pointer-events-none opacity-0" />
 
                 {/* SPLIT PANE — video selected and not in PiP */}
                 {activeVideo && !isPip && (
