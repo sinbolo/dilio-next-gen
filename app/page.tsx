@@ -12,6 +12,10 @@ import { VideoGrid } from "@/components/sections/VideoGrid";
 import { MerchGallery } from "@/components/sections/MerchGallery";
 import { TourSection } from "@/components/sections/TourSection";
 import { SmartSection } from "@/components/ui/SmartSection";
+import { PremiumBookingTitle } from "@/components/ui/PremiumBookingTitle";
+import { HeroTutorial } from "@/components/ui/HeroTutorial";
+import { WorldScroll } from "@/components/ui/WorldScroll";
+import { BookingTutorial } from "@/components/ui/BookingTutorial";
 
 export default function Home() {
   const heroRef = useRef(null);
