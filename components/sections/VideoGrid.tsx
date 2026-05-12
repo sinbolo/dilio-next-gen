@@ -252,7 +252,7 @@ export function VideoGrid() {
   };
 
   return (
-    <section ref={sectionRef} id="section-video" className="min-h-screen relative flex items-center justify-center bg-[#0a0a0a] text-white py-[120px] overflow-hidden">
+    <section ref={sectionRef} id="section-video" className="min-h-screen relative flex items-center justify-center bg-black text-white py-[120px] overflow-hidden">
       <VideoTutorial />
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -265,7 +265,7 @@ export function VideoGrid() {
 
         {/* Floating iPad Mockup */}
         <div 
-          className="relative w-full max-w-[1200px] aspect-[3/4] md:aspect-[16/10] bg-[#1a1a1a] rounded-[2rem] md:rounded-[3rem] p-3 md:p-[22px] shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_30px_60px_rgba(0,0,0,0.8),inset_0_0_0_2px_#333,inset_0_0_20px_rgba(0,0,0,1)] ring-1 ring-black"
+          className="relative w-full max-w-[1200px] aspect-[9/16] md:aspect-[16/10] bg-[#1a1a1a] rounded-[2rem] md:rounded-[3rem] p-3 md:p-[22px] shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_30px_60px_rgba(0,0,0,0.8),inset_0_0_0_2px_#333,inset_0_0_20px_rgba(0,0,0,1)] ring-1 ring-black"
         >
           {/* Metallic Edge Highlight */}
           <div className="absolute inset-0 rounded-[2rem] md:rounded-[3rem] shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] pointer-events-none"></div>
@@ -276,7 +276,7 @@ export function VideoGrid() {
           </div>
           
           {/* Screen Area */}
-          <div className="relative w-full h-full bg-[#0f0f0f] rounded-[1.5rem] md:rounded-[2.2rem] overflow-hidden flex flex-col border border-black shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]">
+          <div className="relative w-full h-full bg-black rounded-[1.5rem] md:rounded-[2.2rem] overflow-hidden flex flex-col border border-black shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]">
             
             {/* TikTok Style Toast Popup */}
             <AnimatePresence>
@@ -327,7 +327,7 @@ export function VideoGrid() {
             </AnimatePresence>
 
             {/* iPad Status Bar */}
-            <div className="h-6 w-full flex justify-between items-center px-6 text-[10.5px] font-medium text-white/80 select-none bg-[#0f0f0f] z-30">
+            <div className="h-6 w-full flex justify-between items-center px-6 text-[10.5px] font-medium text-white/80 select-none bg-black z-30">
               <span>{currentTime}</span>
               <div className="flex gap-2 items-center">
                 <span className="tracking-tighter">5G</span>
@@ -338,7 +338,7 @@ export function VideoGrid() {
             </div>
 
             {/* YouTube UI Header */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-white/10 shrink-0 bg-[#0f0f0f] z-[250]">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-white/10 shrink-0 bg-black z-[250]">
               <div className="flex items-center gap-4">
                 <Menu className="w-6 h-6 text-white/90 cursor-pointer" />
                 <div className="flex items-center gap-1 cursor-pointer">
@@ -374,10 +374,10 @@ export function VideoGrid() {
             </div>
 
             {/* Main Content Area */}
-            <div className="flex flex-1 overflow-hidden relative bg-[#0f0f0f]">
+            <div className="flex flex-1 overflow-hidden relative bg-black">
               
               {/* Mini Sidebar */}
-              <div className="hidden md:flex flex-col w-[72px] border-r border-white/10 py-3 overflow-y-auto shrink-0 bg-[#0f0f0f] z-[250] items-center gap-6">
+              <div className="hidden md:flex flex-col w-[72px] border-r border-white/10 py-3 overflow-y-auto shrink-0 bg-black z-[250] items-center gap-6">
                 <button className="flex flex-col items-center gap-1.5 text-white/90 hover:text-white group">
                   <Home className="w-6 h-6 group-hover:scale-110 transition-transform" />
                   <span className="text-[10px] font-medium">Home</span>
