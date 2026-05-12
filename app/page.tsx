@@ -85,7 +85,7 @@ export default function Home() {
         ref={heroRef}
         className="relative bg-[#ebebeb]"
       >
-        <SmartSection id="hero-inner" minHeight="130vh" className="w-full h-full">
+        <SmartSection id="hero-inner" minHeight="200vh" className="w-full h-full">
           <ScrollVideo totalFrames={329} />
           
           {/* Cinematic Text Overlays */}
