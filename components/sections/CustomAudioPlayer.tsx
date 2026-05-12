@@ -178,11 +178,29 @@ export function CustomAudioPlayer() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Ensure canvas has actual pixel dimensions to draw on
+    const resizeCanvas = () => {
+      const parent = canvas.parentElement;
+      if (parent) {
+        // Use devicePixelRatio for crisp rendering on retina displays
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = parent.clientWidth * dpr;
+        canvas.height = parent.clientHeight * dpr;
+        // Normalize coordinates to ignore DPR in drawing logic
+        ctx.scale(dpr, dpr);
+      }
+    };
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
     const render = () => {
-      const w = canvas.width;
-      const h = canvas.height;
+      // Use logical CSS pixels for drawing, not physical canvas pixels
+      const w = canvas.clientWidth || 300;
+      const h = canvas.clientHeight || 150;
       const centerY = h / 2;
       
+      // We must clear using logical dimensions since ctx is scaled
       ctx.clearRect(0, 0, w, h);
       
       // Draw Waveform (Adaptive Density)
@@ -246,9 +264,10 @@ export function CustomAudioPlayer() {
     render();
 
     return () => {
+      window.removeEventListener('resize', resizeCanvas);
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [isPlaying]);
+  }, [isPlaying, isInView]);
 
   if (!mounted) return null;
 
