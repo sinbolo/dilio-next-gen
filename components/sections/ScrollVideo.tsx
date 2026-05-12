@@ -152,7 +152,7 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
   }, [framesLoaded, frameIndex, totalFrames, isInView]);
 
   return (
-    <div ref={containerRef} className="relative w-full h-[50vh]">
+    <div ref={containerRef} className="relative w-full h-[100vh]">
       <div className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden bg-[#ebebeb]">
         <canvas
           ref={canvasRef}
