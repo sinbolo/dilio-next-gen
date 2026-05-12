@@ -148,8 +148,20 @@ export function CustomAudioPlayer() {
   const animationRef = useRef<number>(0);
   const offsetRef = useRef<number>(0);
 
+  const [isInView, setIsInView] = useState(false);
+  const playerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    if (!isPlaying) {
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    if (playerRef.current) observer.observe(playerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isPlaying || !isInView) {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
       return;
     }
@@ -234,7 +246,7 @@ export function CustomAudioPlayer() {
 
   return (
     <section id="section-music" className="w-full bg-white py-24">
-      <div className="relative w-full max-w-[1400px] mx-auto px-4 flex flex-col items-center">
+      <div ref={playerRef} className="relative w-full max-w-[1400px] mx-auto px-4 flex flex-col items-center" style={{ transform: 'translate3d(0,0,0)' }}>
         {/* Seamless Container (Uniform with Bio section bg-white) */}
         <div className="relative w-[180vw] md:w-full left-1/2 md:left-auto ml-[-90vw] md:ml-0 aspect-[16/9] max-h-[800px] bg-white overflow-visible flex items-center justify-center">
           <div className="relative w-full h-full">

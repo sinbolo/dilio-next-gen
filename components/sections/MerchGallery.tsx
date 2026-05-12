@@ -98,6 +98,7 @@ function ProductCard({
           <img 
             src={product.image} 
             alt={product.name} 
+            loading="lazy"
             className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(255,255,255,0.05)] transition-transform duration-1000 group-hover:scale-105"
             onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
@@ -170,9 +171,10 @@ function ProductCard({
         data-veil={product.id}
         src={product.veil}
         alt=""
+        loading="lazy"
         className="absolute max-w-none pointer-events-none z-[100] origin-center opacity-100 transition-opacity duration-1000 top-1/2 left-1/2"
         style={{
-          transform: `translate(-50%, calc(-50% + ${product.vY || '0%'})) scale(${product.vS || 1})`,
+          transform: `translate3d(-50%, calc(-50% + ${product.vY || '0%'}), 0) scale(${product.vS || 1})`,
           filter: `brightness(var(--veil-brightness, 0.45)) drop-shadow(0 0 30px rgba(0,0,0,1))`,
           maskRepeat: 'no-repeat',
           WebkitMaskRepeat: 'no-repeat',
@@ -327,10 +329,8 @@ export function MerchGallery() {
     let rafId: number;
     
     const syncPhysics = () => {
-      if (!isInView) {
-        rafId = requestAnimationFrame(syncPhysics);
-        return;
-      }
+      if (!isInView) return; // Completely stop loop
+      
       const section = sectionRef.current;
       if (section) {
         const rect = section.getBoundingClientRect();
@@ -507,10 +507,10 @@ export function MerchGallery() {
 
             if (aura) {
               aura.style.opacity = `${Math.pow(intensity, 2) * 0.8}`;
-              aura.style.transform = `translate(-50%, -50%) scale(${1 + intensity * 0.4}) rotate(${intensity * 45}deg)`;
+              aura.style.transform = `translate3d(-50%, -50%, 0) scale(${1 + intensity * 0.4}) rotate(${intensity * 45}deg)`;
             }
             
-            egg.style.transform = `scale(${0.98 + intensity * 0.07})`; // Subtler scale, no rotation
+            egg.style.transform = `translate3d(0, 0, 0) scale(${0.98 + intensity * 0.07})`; // Subtler scale, no rotation
             
             if (toast) {
               toast.style.opacity = `${Math.max(0, (intensity - 0.7) * 3.3)}`;
@@ -528,9 +528,9 @@ export function MerchGallery() {
             }
             if (aura) {
               aura.style.opacity = '0';
-              aura.style.transform = 'translate(-50%, -50%) scale(1)';
+              aura.style.transform = 'translate3d(-50%, -50%, 0) scale(1)';
             }
-            egg.style.transform = 'scale(0.98)';
+            egg.style.transform = 'translate3d(0, 0, 0) scale(0.98)';
             if (toast) toast.style.opacity = '0';
           }
         });

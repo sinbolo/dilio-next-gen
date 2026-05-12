@@ -11,10 +11,7 @@ import { CustomAudioPlayer } from "@/components/sections/CustomAudioPlayer";
 import { VideoGrid } from "@/components/sections/VideoGrid";
 import { MerchGallery } from "@/components/sections/MerchGallery";
 import { TourSection } from "@/components/sections/TourSection";
-import { PremiumBookingTitle } from "@/components/ui/PremiumBookingTitle";
-import { HeroTutorial } from "@/components/ui/HeroTutorial";
-import { WorldScroll } from "@/components/ui/WorldScroll";
-import { BookingTutorial } from "@/components/ui/BookingTutorial";
+import { SmartSection } from "@/components/ui/SmartSection";
 
 export default function Home() {
   const heroRef = useRef(null);
@@ -58,8 +55,6 @@ export default function Home() {
   }, []);
 
   // Premium Transform for "HOUSE MÚSIC" - Color & Movement
-  // Global range: Hero (~0-0.2) -> Creative (~0.2-0.3) -> Bio (~0.3+)
-  // Mobile range adjusted to disappear much earlier (0.22-0.25 instead of 0.30-0.35)
   const textOpacity2 = useTransform(
     globalScroll, 
     isMobile ? [0.18, 0.22, 0.23, 0.26] : [0.18, 0.22, 0.30, 0.35], 
@@ -74,64 +69,70 @@ export default function Home() {
   const textColor2 = useTransform(globalScroll, [0.20, 0.30], ["#ffffff", "#10b981"]);
   const textGlow2 = useTransform(globalScroll, [0.20, 0.30], ["0 0 0px transparent", "0 0 20px rgba(16, 185, 129, 0.4)"]);
 
-
   return (
     <main className="bg-transparent">
       <HeroTutorial />
       <BookingWidget />
 
       {/* Hero Section with ScrollVideo */}
-      <section 
-        id="section-1-hero" 
-        ref={heroRef}
-        className="relative bg-transparent"
-      >
-        <ScrollVideo totalFrames={329} />
-        
-        {/* Cinematic Text Overlays */}
-        <div className="fixed inset-0 pointer-events-none z-20 flex flex-col items-center justify-center p-12 md:p-20">
+      <SmartSection id="section-1-hero" minHeight="100vh">
+        <div ref={heroRef} className="relative w-full h-full">
+          <ScrollVideo totalFrames={329} />
+          
+          {/* Cinematic Text Overlays */}
+          <div className="fixed inset-0 pointer-events-none z-20 flex flex-col items-center justify-center p-12 md:p-20">
+            <motion.div 
+              style={{ 
+                opacity: textOpacity2, 
+                y: textY2,
+                color: textColor2,
+                textShadow: textGlow2,
+                filter: useTransform(textBlur2, (v) => `blur(${v}px)`)
+              }}
+              className="flex flex-col items-center text-center"
+            >
+              <h2 className="display-md mb-2">HOUSE MÚSIC</h2>
+            </motion.div>
 
-          <motion.div 
-            style={{ 
-              opacity: textOpacity2, 
-              y: textY2,
-              color: textColor2,
-              textShadow: textGlow2,
-              filter: useTransform(textBlur2, (v) => `blur(${v}px)`)
-            }}
-            className="flex flex-col items-center text-center"
-          >
-            <h2 className="display-md mb-2">HOUSE MÚSIC</h2>
-          </motion.div>
-
-          <motion.div 
-            style={{ opacity: textOpacity3 }}
-            className="absolute bottom-12 md:bottom-20 flex justify-center w-full"
-          >
-            <span className="label-xs tracking-[0.3em] text-center max-w-md">
-              SOUND & ART
-            </span>
-          </motion.div>
+            <motion.div 
+              style={{ opacity: textOpacity3 }}
+              className="absolute bottom-12 md:bottom-20 flex justify-center w-full"
+            >
+              <span className="label-xs tracking-[0.3em] text-center max-w-md">
+                SOUND & ART
+              </span>
+            </motion.div>
+          </div>
         </div>
-      </section>
+      </SmartSection>
 
       {/* Section 2 - Creative Navigation */}
-      <CreativeNavigation />
+      <SmartSection id="section-2-creative" minHeight="100vh">
+        <CreativeNavigation />
+      </SmartSection>
 
       {/* Section 'Bio' */}
-      <BioSection />
+      <SmartSection id="section-bio" minHeight="800px">
+        <BioSection />
+      </SmartSection>
 
-      {/* Section 3 - Music Player */}
-      <CustomAudioPlayer />
+      {/* Section 3 - Music Player (Rule 3.A: Persistent) */}
+      <SmartSection id="section-music" minHeight="800px" isPersistent={true}>
+        <CustomAudioPlayer />
+      </SmartSection>
 
-      {/* Section 4 - Video Grid */}
-      <VideoGrid />
+      {/* Section 4 - Video Grid (Rule 3.A: Persistent for PiP) */}
+      <SmartSection id="section-video" minHeight="1000px" isPersistent={true}>
+        <VideoGrid />
+      </SmartSection>
 
       {/* Section 5 - Merch Gallery */}
-      <MerchGallery />
+      <SmartSection id="section-merch" minHeight="1000px">
+        <MerchGallery />
+      </SmartSection>
 
-      {/* Section 6 - Contact (Enterprise Demo) */}
-      <section id="section-6-contact" className="relative flex items-center justify-center bg-white py-[120px] isolate z-0">
+      {/* Section 6 - Contact */}
+      <SmartSection id="section-6-contact" minHeight="800px" className="bg-white py-[120px] isolate z-0">
         <div className="max-w-[1400px] w-full mx-auto px-10 grid grid-cols-1 md:grid-cols-2 gap-20">
             <div className="flex flex-col items-center md:items-start gap-8">
               <PremiumBookingTitle text="BOOKING" />
@@ -144,11 +145,12 @@ export default function Home() {
               <ContactForm />
             </div>
         </div>
-      </section>
+      </SmartSection>
 
       {/* Section 7 - Tour */}
-      <TourSection />
-
+      <SmartSection id="section-tour" minHeight="800px">
+        <TourSection />
+      </SmartSection>
     </main>
   );
 }

@@ -504,7 +504,7 @@ export function VideoGrid() {
                         <div key={vid.id} className="flex gap-3 group cursor-pointer" onClick={() => { setActiveVideo(vid); setIsPlaying(false); playStartRef.current = null; }}>
                           <div className="w-[160px] aspect-video rounded-lg overflow-hidden relative shrink-0 bg-[#1a1a1a]">
                             {vid.thumbnail ? (
-                              <img src={vid.thumbnail} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                              <img src={vid.thumbnail} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center bg-[#111]">
                                 <PlaySquare className="w-6 h-6 text-white/10" />
@@ -532,7 +532,7 @@ export function VideoGrid() {
                       <div key={vid.id} className="flex flex-col gap-3 group cursor-pointer" onClick={() => { setActiveVideo(vid); setIsPlaying(false); playStartRef.current = null; setIsPip(false); setPipDismissed(false); }}>
                         <div className="relative aspect-video rounded-xl overflow-hidden bg-[#1a1a1a]">
                           {vid.thumbnail ? (
-                            <img src={vid.thumbnail} alt={vid.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                            <img src={vid.thumbnail} alt={vid.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                           ) : (
                             <div className="w-full h-full flex flex-col items-center justify-center bg-[#111] relative overflow-hidden">
                               <PlaySquare className="w-12 h-12 text-white/5 mb-2" />

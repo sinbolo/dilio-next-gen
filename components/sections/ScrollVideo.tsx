@@ -29,12 +29,17 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
 
   const frameIndex = useTransform(smoothProgress, [0, 1], [1, totalFrames], { clamp: true });
 
+  const isMobileRef = useRef(false);
+
   // Intelligent Frame Batch Loading
   useEffect(() => {
-    imagesRef.current = new Array(totalFrames).fill(null);
+    isMobileRef.current = window.innerWidth < 768;
+    const effectiveFrames = isMobileRef.current ? Math.min(150, totalFrames) : totalFrames;
+    
+    imagesRef.current = new Array(effectiveFrames).fill(null);
     let loadedInBatch1 = 0;
-    const BATCH1_SIZE = 30;
-    const BATCH2_SIZE = 70; // From 31 to 100
+    const BATCH1_SIZE = isMobileRef.current ? 20 : 30;
+    const BATCH2_SIZE = isMobileRef.current ? 40 : 70; 
 
     const loadFrame = (i: number, onComplete?: () => void) => {
       if (imagesRef.current[i - 1]) return; // Already loading/loaded
@@ -64,10 +69,11 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
       });
     }
 
-    // PHASE 3: Load the rest (101-329) ONLY when user starts scrolling
+    // PHASE 3: Load the rest ONLY when user starts scrolling
     const unsubscribe = scrollYProgress.on("change", (latest) => {
       if (latest > 0.02) { // User has started moving
-        for (let k = BATCH1_SIZE + BATCH2_SIZE + 1; k <= totalFrames; k++) {
+        const maxFrames = isMobileRef.current ? Math.min(150, totalFrames) : totalFrames;
+        for (let k = BATCH1_SIZE + BATCH2_SIZE + 1; k <= maxFrames; k++) {
           loadFrame(k);
         }
         unsubscribe(); // Only trigger once
@@ -96,8 +102,15 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
 
     const render = () => {
       const imgs = imagesRef.current;
+      const maxFrames = isMobileRef.current ? Math.min(150, totalFrames) : totalFrames;
       let current = Math.round(frameIndex.get());
-      current = Math.max(1, Math.min(totalFrames, current));
+      
+      // On mobile, we remap the scroll range to our 150 frames
+      if (isMobileRef.current && totalFrames > 150) {
+        current = Math.round((current / totalFrames) * 150);
+      }
+      
+      current = Math.max(1, Math.min(maxFrames, current));
 
       // SKIP processing if we already rendered this frame
       if (current === lastIndexRef.current) {
@@ -115,15 +128,8 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
             canvas.width = img.naturalWidth;
             canvas.height = img.naturalHeight;
           }
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, -10, canvas.width, canvas.height + 10);
-          try {
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const d = imageData.data;
-            for (let i = 0; i < d.length; i += 4) {
-              if (d[i] > 230 && d[i + 1] > 230 && d[i + 2] > 230) d[i + 3] = 0;
-            }
-            ctx.putImageData(imageData, 0, 0);
-          } catch { /* ignore cross-origin */ }
         }
       }
       rafId = requestAnimationFrame(render);
@@ -139,7 +145,11 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
         <canvas
           ref={canvasRef}
           className="w-[85vw] h-[85vh] md:w-[65vw] md:h-[65vh] object-contain -translate-y-8 md:translate-y-0"
-          style={{ opacity: framesLoaded ? 1 : 0, transition: 'opacity 0.6s ease-in-out' }}
+          style={{ 
+            opacity: framesLoaded ? 1 : 0, 
+            transition: 'opacity 0.6s ease-in-out',
+            mixBlendMode: 'multiply' // Efficient hardware-accelerated "white removal"
+          }}
         />
         {/* Small non-blocking loader indicator — NOT fullscreen */}
         {!framesLoaded && (
