@@ -673,7 +673,7 @@ export function CustomAudioPlayer() {
               className="absolute z-[150] pointer-events-none flex items-center justify-center"
               style={{ 
                 top: '30.00%',
-                left: isConnecting === 1 ? '30.63%' : '31.48%',
+                left: isConnecting === 1 ? '33.63%' : '34.48%',
                 width: '6.5%', 
                 aspectRatio: '16/9'
               }}
@@ -714,7 +714,7 @@ export function CustomAudioPlayer() {
               className="absolute z-[140] pointer-events-none flex items-center justify-center"
               style={{ 
                 top: '30.00%',
-                left: activeUsb === 1 ? '30.63%' : '31.48%',
+                left: activeUsb === 1 ? '33.63%' : '34.48%',
                 width: '6.5%', 
                 aspectRatio: '16/9',
                 x: '-50%',
