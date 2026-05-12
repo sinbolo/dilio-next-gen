@@ -46,6 +46,8 @@ export function CustomAudioPlayer() {
   const widgetRef = useRef<any>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
+  const [isReady, setIsReady] = useState(false);
+
   // Sync mounted state to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
@@ -69,6 +71,7 @@ export function CustomAudioPlayer() {
 
         widget.bind(window.SC.Widget.Events.READY, () => {
           console.log("SoundCloud Widget Ready");
+          setIsReady(true);
           widget.getDuration((d: number) => setDuration(d));
         });
 
@@ -98,11 +101,15 @@ export function CustomAudioPlayer() {
     return () => {
       if (initInterval) clearInterval(initInterval);
       if (widgetRef.current) {
-        widgetRef.current.unbind(window.SC.Widget.Events.READY);
-        widgetRef.current.unbind(window.SC.Widget.Events.PLAY);
-        widgetRef.current.unbind(window.SC.Widget.Events.PAUSE);
-        widgetRef.current.unbind(window.SC.Widget.Events.FINISH);
-        widgetRef.current.unbind(window.SC.Widget.Events.PLAY_PROGRESS);
+        try {
+          widgetRef.current.unbind(window.SC.Widget.Events.READY);
+          widgetRef.current.unbind(window.SC.Widget.Events.PLAY);
+          widgetRef.current.unbind(window.SC.Widget.Events.PAUSE);
+          widgetRef.current.unbind(window.SC.Widget.Events.FINISH);
+          widgetRef.current.unbind(window.SC.Widget.Events.PLAY_PROGRESS);
+        } catch (e) {
+          console.warn("SoundCloud widget unbind failed, likely due to iframe removal:", e);
+        }
       }
     };
   }, [mounted]);
@@ -264,7 +271,7 @@ export function CustomAudioPlayer() {
         {/* --- LCD SCREEN OVERLAY --- */}
         <div 
           onClick={() => {
-            if (isConnecting || isPlaying) return;
+            if (isConnecting || isPlaying || !isReady) return;
             setIsPlaying(true);
             widgetRef.current?.play();
           }}
@@ -541,7 +548,7 @@ export function CustomAudioPlayer() {
         {/* PLAY/PAUSE Button Overlay - Physical Round Button Look */}
         <div 
           onClick={() => {
-            if (isConnecting) return;
+            if (isConnecting || !isReady) return;
             if (isPlaying) {
               widgetRef.current?.pause();
               setIsPlaying(false);
