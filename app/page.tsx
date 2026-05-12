@@ -31,6 +31,7 @@ export default function Home() {
 
   // Mobile detection for adjusted scroll ranges
   const [isMobile, setIsMobile] = useState(false);
+  const [isVideoPipActive, setIsVideoPipActive] = useState(false);
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
@@ -84,7 +85,7 @@ export default function Home() {
         ref={heroRef}
         className="relative bg-[#ebebeb]"
       >
-        <SmartSection id="hero-inner" minHeight="150vh" className="w-full h-full">
+        <SmartSection id="hero-inner" minHeight="100vh" className="w-full h-full">
           <ScrollVideo totalFrames={329} />
           
           {/* Cinematic Text Overlays */}
@@ -130,8 +131,8 @@ export default function Home() {
       </SmartSection>
 
       {/* Section 4 - Video Grid (Rule 3.A: Persistent ONLY if PiP is active) */}
-      <SmartSection id="section-video" minHeight="1000px">
-        <VideoGrid />
+      <SmartSection id="section-video" minHeight="1000px" isPersistent={isVideoPipActive}>
+        <VideoGrid onPipChange={setIsVideoPipActive} />
       </SmartSection>
 
       {/* Section 5 - Merch Gallery */}
