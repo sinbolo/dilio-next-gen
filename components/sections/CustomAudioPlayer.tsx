@@ -670,24 +670,29 @@ export function CustomAudioPlayer() {
           {isConnecting !== 0 && (
             <motion.div
               key={`connecting-${isConnecting}`}
+              className="absolute z-[150] pointer-events-none flex items-center justify-center"
+              style={{ 
+                top: '24.68%',
+                left: isConnecting === 1 ? '28.63%' : '29.48%',
+                width: '6.5%', 
+                aspectRatio: '16/9'
+              }}
               initial={{ 
-                x: -450, 
-                y: isConnecting === 2 ? -25 : -145, 
-                scale: 0.04, 
+                x: '-700%', 
+                y: isConnecting === 1 ? '-150%' : '110%', 
+                scale: 0.61, 
                 opacity: 0, 
-                rotateZ: isConnecting === 2 ? 12 : -15 
+                rotateZ: isConnecting === 1 ? -15 : 12 
               }}
               animate={{ 
-                x: [-450, -350, isConnecting === 2 ? (isMobile ? -144 : -222) : (isMobile ? -150 : -228)], 
-                y: [isConnecting === 2 ? -25 : -145, -205, isMobile ? -100 : -150], 
-                scale: [0.04, 0.08, 0.065], 
-                rotateZ: [isConnecting === 2 ? 12 : -15, 20, 0],
+                x: ['-700%', '-500%', '-50%'], 
+                y: isConnecting === 1 ? ['-150%', '-280%', '-50%'] : ['110%', '-150%', '-50%'], 
+                scale: [0.61, 1.23, 1], 
+                rotateZ: isConnecting === 1 ? [-15, 20, 0] : [12, 20, 0],
                 opacity: [0, 1, 1]
               }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.2, ease: "easeOut" }}
-              className="absolute z-[150] pointer-events-none"
-              style={{ width: '100%', height: '100%' }}
             >
               <Image 
                 src={`/assets/usb-${isConnecting || 1}-plugged-custom.png`} 
@@ -706,11 +711,14 @@ export function CustomAudioPlayer() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.1 }}
-              className="absolute z-[140] pointer-events-none"
+              className="absolute z-[140] pointer-events-none flex items-center justify-center"
               style={{ 
-                width: '100%', 
-                height: '100%',
-                transform: `translateX(${activeUsb === 1 ? (isMobile ? -150 : -228) : (isMobile ? -144 : -222)}px) translateY(${isMobile ? -100 : -150}px) scale(0.065)`
+                top: '24.68%',
+                left: activeUsb === 1 ? '28.63%' : '29.48%',
+                width: '6.5%', 
+                aspectRatio: '16/9',
+                x: '-50%',
+                y: '-50%'
               }}
             >
               <Image 
@@ -720,7 +728,7 @@ export function CustomAudioPlayer() {
                 className="object-contain" 
               />
               <div 
-                className="absolute top-[48%] left-[49.5%] w-14 h-14 bg-red-600 rounded-full shadow-[0_0_120px_#ff0000,0_0_60px_#ff0000] z-[160]"
+                className="absolute top-[48%] left-[49.5%] w-[8px] h-[8px] md:w-[14px] md:h-[14px] bg-red-600 rounded-full shadow-[0_0_120px_#ff0000,0_0_60px_#ff0000] z-[160]"
                 style={{ transform: 'translate(-50%, -50%)', animation: 'led-blink 0.8s infinite alternate' }}
               />
             </motion.div>
