@@ -178,9 +178,10 @@ export function CustomAudioPlayer() {
       
       ctx.clearRect(0, 0, w, h);
       
-      // Draw Waveform (Infinite High-Density System)
-      const barWidth = 2;
-      const gap = 0.5; // High density, nearly solid
+      // Draw Waveform (Adaptive Density)
+      const isMobile = window.innerWidth < 768;
+      const barWidth = isMobile ? 3 : 2;
+      const gap = isMobile ? 1.5 : 0.5; 
       const step = barWidth + gap;
       const count = Math.ceil(w / step);
       
@@ -246,7 +247,7 @@ export function CustomAudioPlayer() {
 
   return (
     <section id="section-music" className="w-full bg-white py-24">
-      <div ref={playerRef} className="relative w-full max-w-[1400px] mx-auto px-4 flex flex-col items-center" style={{ transform: 'translate3d(0,0,0)' }}>
+      <div ref={playerRef} className="relative w-full max-w-[1400px] mx-auto px-4 flex flex-col items-center" style={{ transform: 'translate3d(0,0,0)', willChange: 'transform' }}>
         {/* Seamless Container (Uniform with Bio section bg-white) */}
         <div className="relative w-[180vw] md:w-full left-1/2 md:left-auto ml-[-90vw] md:ml-0 aspect-[16/9] max-h-[800px] bg-white overflow-visible flex items-center justify-center">
           <div className="relative w-full h-full">
