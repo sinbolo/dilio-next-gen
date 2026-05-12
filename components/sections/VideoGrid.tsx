@@ -60,7 +60,12 @@ const videos = [
 export function VideoGrid() {
   const [activeVideo, setActiveVideo] = useState<typeof videos[0] | null>(videos[0]);
   const [isPip, setIsPip] = useState(false);
-  const [pipDismissed, setPipDismissed] = useState(false);
+  const [pipDismissed, _setPipDismissed] = useState(false);
+  const pipDismissedRef = useRef(false);
+  const setPipDismissed = (val: boolean) => {
+    pipDismissedRef.current = val;
+    _setPipDismissed(val);
+  };
   const [subscribeState, setSubscribeState] = useState<'idle' | 'redirect'>('idle');
   const [particles, setParticles] = useState<{id: number, text: string, x: number}[]>([]);
   const [likes, setLikes] = useState<{id: number, x: number, y: number, sway: number, scale: number, color: string}[]>([]);
@@ -106,7 +111,7 @@ export function VideoGrid() {
       const rect = sectionRef.current.getBoundingClientRect();
       const isOutOfView = rect.bottom < 100 || rect.top > window.innerHeight - 100;
       if (isOutOfView) {
-        if (!pipDismissed && isPlayingRef.current) setIsPip(true);
+        if (!pipDismissedRef.current && isPlayingRef.current) setIsPip(true);
       } else {
         setIsPip(false);
         setPipDismissed(false);
@@ -123,7 +128,7 @@ export function VideoGrid() {
       window.removeEventListener("resize", updateVideoPos);
       clearInterval(langInterval);
     };
-  }, [pipDismissed]);
+  }, []);
 
   const handleClosePip = () => {
     setIsPip(false);

@@ -13,7 +13,7 @@ export function BookingWidget() {
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
-    window.addEventListener("resize", checkMobile);
+    window.addEventListener("resize", checkMobile, { passive: true });
 
     const observer = new IntersectionObserver(
       (entries) => {

@@ -29,32 +29,53 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
 
   const frameIndex = useTransform(smoothProgress, [0, 1], [1, totalFrames], { clamp: true });
 
-  // Load frames in background — never blocks render
+  // Intelligent Frame Batch Loading
   useEffect(() => {
     imagesRef.current = new Array(totalFrames).fill(null);
-    let loaded = 0;
-    const BATCH = 30; // Load first 30 frames immediately
+    let loadedInBatch1 = 0;
+    const BATCH1_SIZE = 30;
+    const BATCH2_SIZE = 70; // From 31 to 100
 
-    const loadFrame = (i: number) => {
+    const loadFrame = (i: number, onComplete?: () => void) => {
+      if (imagesRef.current[i - 1]) return; // Already loading/loaded
       const img = new Image();
       const frameNum = String(i).padStart(3, '0');
       img.src = `/video300_frames/frame_${frameNum}.jpg`;
       img.onload = () => {
         imagesRef.current[i - 1] = img;
-        loaded++;
-        if (loaded === BATCH) setFramesLoaded(true);
+        if (onComplete) onComplete();
       };
       img.onerror = () => {
-        loaded++;
-        if (loaded === BATCH) setFramesLoaded(true);
+        if (onComplete) onComplete();
       };
     };
 
-    // Load ALL frames immediately for maximum speed as requested
-    for (let i = 1; i <= totalFrames; i++) {
-      loadFrame(i);
+    // PHASE 1: Load first 30 frames immediately for first paint
+    for (let i = 1; i <= BATCH1_SIZE; i++) {
+      loadFrame(i, () => {
+        loadedInBatch1++;
+        if (loadedInBatch1 === BATCH1_SIZE) {
+          setFramesLoaded(true);
+          // PHASE 2: Load next 70 frames in background once critical path is clear
+          for (let j = BATCH1_SIZE + 1; j <= BATCH1_SIZE + BATCH2_SIZE; j++) {
+            loadFrame(j);
+          }
+        }
+      });
     }
-  }, [totalFrames]);
+
+    // PHASE 3: Load the rest (101-329) ONLY when user starts scrolling
+    const unsubscribe = scrollYProgress.on("change", (latest) => {
+      if (latest > 0.02) { // User has started moving
+        for (let k = BATCH1_SIZE + BATCH2_SIZE + 1; k <= totalFrames; k++) {
+          loadFrame(k);
+        }
+        unsubscribe(); // Only trigger once
+      }
+    });
+
+    return () => unsubscribe();
+  }, [totalFrames, scrollYProgress]);
 
   // Render loop
   const lastIndexRef = useRef(-1);

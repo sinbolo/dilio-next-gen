@@ -51,7 +51,7 @@ export function CustomAudioPlayer() {
     setMounted(true);
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
-    window.addEventListener("resize", checkMobile);
+    window.addEventListener("resize", checkMobile, { passive: true });
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
@@ -59,11 +59,11 @@ export function CustomAudioPlayer() {
   useEffect(() => {
     if (!mounted) return;
 
-    const script = document.createElement("script");
-    script.src = "https://w.soundcloud.com/player/api.js";
-    script.async = true;
-    script.onload = () => {
+    let initInterval: NodeJS.Timeout;
+    
+    const initWidget = () => {
       if (iframeRef.current && window.SC) {
+        clearInterval(initInterval);
         widgetRef.current = window.SC.Widget(iframeRef.current);
         const widget = widgetRef.current;
 
@@ -86,11 +86,23 @@ export function CustomAudioPlayer() {
         });
       }
     };
-    document.body.appendChild(script);
+
+    // Try immediately
+    initWidget();
+
+    // If not ready, poll until it is
+    if (!widgetRef.current) {
+      initInterval = setInterval(initWidget, 500);
+    }
 
     return () => {
-      if (script.parentNode) {
-        document.body.removeChild(script);
+      if (initInterval) clearInterval(initInterval);
+      if (widgetRef.current) {
+        widgetRef.current.unbind(window.SC.Widget.Events.READY);
+        widgetRef.current.unbind(window.SC.Widget.Events.PLAY);
+        widgetRef.current.unbind(window.SC.Widget.Events.PAUSE);
+        widgetRef.current.unbind(window.SC.Widget.Events.FINISH);
+        widgetRef.current.unbind(window.SC.Widget.Events.PLAY_PROGRESS);
       }
     };
   }, [mounted]);

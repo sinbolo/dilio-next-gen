@@ -54,34 +54,31 @@ const products = [
 function ProductCard({ 
   product, 
   addItem, 
-  sectionRef,
   onMeasure 
 }: { 
   product: typeof products[0], 
   addItem: any, 
-  sectionRef: React.RefObject<HTMLElement | null>,
   onMeasure: (id: string, rect: DOMRect) => void
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
 
+  // Measure once on mount and expose ref for parent-driven updates.
+  // The parent MerchGallery handles all resize/scroll re-measurements centrally
+  // to avoid N×2 global listeners (one pair per card).
   useEffect(() => {
-    const updateOffset = () => {
-      if (cardRef.current && sectionRef.current) {
-        const cRect = cardRef.current.getBoundingClientRect();
-        // Report position to parent for individual veil masking
-        onMeasure(product.id, cRect);
-      }
-    };
+    if (cardRef.current) {
+      onMeasure(product.id, cardRef.current.getBoundingClientRect());
+    }
 
-    updateOffset();
-    window.addEventListener('resize', updateOffset);
-    window.addEventListener('scroll', updateOffset, { passive: true });
-    
-    return () => {
-      window.removeEventListener('resize', updateOffset);
-      window.removeEventListener('scroll', updateOffset);
-    };
-  }, [sectionRef, onMeasure, product.id]);
+    // Use ResizeObserver for this card only — no global listener needed
+    const ro = new ResizeObserver(() => {
+      if (cardRef.current) {
+        onMeasure(product.id, cardRef.current.getBoundingClientRect());
+      }
+    });
+    if (cardRef.current) ro.observe(cardRef.current);
+    return () => ro.disconnect();
+  }, [onMeasure, product.id]);
 
   return (
     <div 
@@ -98,6 +95,7 @@ function ProductCard({
           <img 
             src={product.image} 
             alt={product.name} 
+            loading="lazy"
             className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(255,255,255,0.05)] transition-transform duration-1000 group-hover:scale-105"
             onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
@@ -170,6 +168,7 @@ function ProductCard({
         data-veil={product.id}
         src={product.veil}
         alt=""
+        loading="lazy"
         className="absolute max-w-none pointer-events-none z-[100] origin-center opacity-100 transition-opacity duration-1000 top-1/2 left-1/2"
         style={{
           transform: `translate(-50%, calc(-50% + ${product.vY || '0%'})) scale(${product.vS || 1})`,
@@ -192,7 +191,7 @@ export function MerchGallery() {
     setMounted(true);
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
-    window.addEventListener("resize", checkMobile);
+    window.addEventListener("resize", checkMobile, { passive: true });
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
   const mouseX = useMotionValue(-9999);
@@ -200,7 +199,7 @@ export function MerchGallery() {
   const sectionRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { addItem, isCartOpen, setIsCartOpen, unlockFreeShipping } = useCart();
-  const cardRectsRef = useRef<Record<string, DOMRect>>({});
+
   const [rectsLoaded, setRectsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
   
@@ -210,7 +209,22 @@ export function MerchGallery() {
   const cardsRef = useRef<HTMLElement[]>([]);
   const textMasksRef = useRef<HTMLElement[]>([]);
   const easterEggsRef = useRef<HTMLElement[]>([]);
+  
+  // High-performance element caches
+  const veilMapRef = useRef<Record<string, HTMLElement>>({});
+  const productMaskMapRef = useRef<Record<string, HTMLElement>>({});
+  const metaLayerMapRef = useRef<Record<string, HTMLElement>>({});
+  const bgMaskMapRef = useRef<Record<string, HTMLElement>>({});
+  const eggElementsMapRef = useRef<Record<string, {
+    phosphor: HTMLElement | null,
+    real: HTMLElement | null,
+    toast: HTMLElement | null,
+    aura: HTMLElement | null
+  }>>({});
+
+  const cardRectsRef = useRef<Record<string, DOMRect>>({});
   const eggRectsRef = useRef<Record<string, DOMRect>>({});
+  const sectionRectRef = useRef<DOMRect | null>(null);
   const hasAutoAddedRef = useRef(false);
   const flashOverlayRef = useRef<HTMLDivElement>(null);
 
@@ -230,54 +244,84 @@ export function MerchGallery() {
     const updateCache = () => {
       if (!sectionRef.current) return;
       
-      // 1. Discover elements first
-      cardsRef.current = Array.from(sectionRef.current.querySelectorAll<HTMLElement>('[data-measure]'));
-      veilsRef.current = Array.from(sectionRef.current.querySelectorAll<HTMLElement>('[data-veil]'));
-      textMasksRef.current = Array.from(sectionRef.current.querySelectorAll<HTMLElement>('[data-text-mask]'));
-      easterEggsRef.current = Array.from(sectionRef.current.querySelectorAll<HTMLElement>('[data-easter-egg]'));
+      const section = sectionRef.current;
+      sectionRectRef.current = section.getBoundingClientRect();
+      
+      // 1. Discover elements
+      cardsRef.current = Array.from(section.querySelectorAll<HTMLElement>('[data-measure]'));
+      veilsRef.current = Array.from(section.querySelectorAll<HTMLElement>('[data-veil]'));
+      textMasksRef.current = Array.from(section.querySelectorAll<HTMLElement>('[data-text-mask]'));
+      easterEggsRef.current = Array.from(section.querySelectorAll<HTMLElement>('[data-easter-egg]'));
       
       const newCardRects: Record<string, DOMRect> = {};
       const newEggRects: Record<string, DOMRect> = {};
+      const newVeilMap: Record<string, HTMLElement> = {};
+      const newProductMaskMap: Record<string, HTMLElement> = {};
+      const newMetaLayerMap: Record<string, HTMLElement> = {};
+      const newBgMaskMap: Record<string, HTMLElement> = {};
+      const newEggElementsMap: Record<string, any> = {};
 
-      // 2. Measure everything in one go
+      // 2. Measure and Cache everything
       cardsRef.current.forEach(card => {
         const id = card.getAttribute('data-measure');
         if (id) {
           newCardRects[id] = card.getBoundingClientRect();
+          
+          const veil = section.querySelector(`[data-veil="${id}"]`) as HTMLElement;
+          if (veil) newVeilMap[id] = veil;
+          
+          const prodCont = section.querySelector(`[data-product-mask="${id}"]`) as HTMLElement;
+          if (prodCont) newProductMaskMap[id] = prodCont;
+          
+          const metaLayer = section.querySelector(`[data-metadata-container="${id}"]`) as HTMLElement;
+          if (metaLayer) newMetaLayerMap[id] = metaLayer;
+          
+          const bgMask = section.querySelector(`[data-product-background="${id}"]`) as HTMLElement;
+          if (bgMask) newBgMaskMap[id] = bgMask;
         }
       });
 
       easterEggsRef.current.forEach((egg, idx) => {
         const id = `egg-${idx}`;
         newEggRects[id] = egg.getBoundingClientRect();
+        newEggElementsMap[id] = {
+          phosphor: egg.querySelector<HTMLElement>('[data-easter-layer="phosphor"]'),
+          real: egg.querySelector<HTMLElement>('[data-easter-layer="real"]'),
+          toast: egg.querySelector<HTMLElement>('[data-easter-toast]'),
+          aura: egg.querySelector<HTMLElement>('[data-easter-layer="aura"]')
+        };
       });
 
       cardRectsRef.current = newCardRects;
       eggRectsRef.current = newEggRects;
+      veilMapRef.current = newVeilMap;
+      productMaskMapRef.current = newProductMaskMap;
+      metaLayerMapRef.current = newMetaLayerMap;
+      bgMaskMapRef.current = newBgMaskMap;
+      eggElementsMapRef.current = newEggElementsMap;
+      
       setRectsLoaded(true);
     };
 
     // Immediate and delayed measurement to ensure layout is stable
     updateCache();
     const timer = setTimeout(updateCache, 150);
-    const timer2 = setTimeout(updateCache, 1000); // Late recovery for slow assets
+    const timer2 = setTimeout(updateCache, 1000);
     
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('resize', updateCache);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('resize', updateCache, { passive: true });
     
-    // Using a more efficient way to track scroll-based position shifts
     const scrollObserver = () => {
-       // Minimal updates during scroll
        if (sectionRef.current) {
-         const rect = sectionRef.current.getBoundingClientRect();
-         sectionRef.current.style.setProperty('--section-top', `${rect.top}px`);
+         sectionRectRef.current = sectionRef.current.getBoundingClientRect();
+         sectionRef.current.style.setProperty('--section-top', `${sectionRectRef.current.top}px`);
        }
     };
     window.addEventListener('scroll', scrollObserver, { passive: true });
 
     const observer = new IntersectionObserver(
       ([entry]) => setIsInView(entry.isIntersecting),
-      { threshold: 0.05 }
+      { threshold: 0.05, rootMargin: '200px' }
     );
     if (sectionRef.current) observer.observe(sectionRef.current);
 
@@ -327,13 +371,11 @@ export function MerchGallery() {
     let rafId: number;
     
     const syncPhysics = () => {
-      if (!isInView) {
-        rafId = requestAnimationFrame(syncPhysics);
-        return;
-      }
+      if (!isInView) return; // Completely stop loop when not in view
+      
       const section = sectionRef.current;
-      if (section) {
-        const rect = section.getBoundingClientRect();
+      const rect = sectionRectRef.current;
+      if (section && rect) {
         const mx = mouseXRef.current.get();
         const my = mouseYRef.current.get();
         const isMouseInside = mx >= rect.left && mx <= rect.right && my >= rect.top && my <= rect.bottom;
@@ -343,11 +385,10 @@ export function MerchGallery() {
         const rx = mx - rect.left;
         const ry = my - rect.top;
 
-        // Drive global section vars (Atmospheric Background)
         section.style.setProperty('--mouse-x', `${rx}px`);
         section.style.setProperty('--mouse-y', `${ry}px`);
         
-        // 2. Optical Constants (Optimized for mobile performance/visibility)
+        // 2. Optical Constants
         const R_CLEAN = isMobileRef.current ? 25 : 15;
         const R_GLOW = isMobileRef.current ? 65 : 45;
         const R_FALLOFF = isMobileRef.current ? 120 : 90;
@@ -355,29 +396,11 @@ export function MerchGallery() {
         // 3. Drive Flashlight Cursor
         const flare = flareRef.current;
         if (flare) {
-          flare.style.display = isHovering ? 'block' : 'none';
           flare.style.transform = `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%)`;
           flare.style.opacity = isHovering ? '1' : '0';
         }
 
-        // JIT Discovery & Cache Recovery (Safety Net)
-        if (cardsRef.current.length === 0) {
-          cardsRef.current = Array.from(section.querySelectorAll<HTMLElement>('[data-measure]'));
-        }
-        if (textMasksRef.current.length === 0) {
-          textMasksRef.current = Array.from(section.querySelectorAll<HTMLElement>('[data-text-mask]'));
-        }
-        if (easterEggsRef.current.length === 0) {
-          easterEggsRef.current = Array.from(section.querySelectorAll<HTMLElement>('[data-easter-egg]'));
-        }
-
-        // Ensure header rect is measured if missing from main cache
-        if (!cardRectsRef.current['merch-header']) {
-          const header = section.querySelector('[data-measure="merch-header"]');
-          if (header) cardRectsRef.current['merch-header'] = header.getBoundingClientRect();
-        }
-
-        // 4. Drive Cards (Local Background & Veil Logic)
+        // 4. Drive Cards
         cardsRef.current.forEach(cardEl => {
           const id = cardEl.getAttribute('data-measure');
           if (!id) return;
@@ -394,42 +417,34 @@ export function MerchGallery() {
           cardEl.style.setProperty('--local-y', `${ly}px`);
           cardEl.style.setProperty('--veil-brightness', `${0.45 + proximity * 0.8}`);
 
-          // Drive attached Veil if present
-          const veil = section.querySelector(`[data-veil="${id}"]`) as HTMLElement;
+          // Drive attached Veil
+          const veil = veilMapRef.current[id];
           if (veil) {
             const product = products.find(p => p.id === id);
             const scale = product?.vS || 1;
-            
-            // Mouse relative to card center
             const dx = (lx - vRect.width / 2) / scale;
             const dy = (ly - vRect.height / 2) / scale;
-            
-            const r1 = R_CLEAN / scale;
-            const r2 = R_GLOW / scale;
-            const r3 = R_FALLOFF / scale;
+            const r1 = R_CLEAN / scale, r2 = R_GLOW / scale, r3 = R_FALLOFF / scale;
 
-            // Veil is opaque everywhere, hiding the entire card space, but makes a hole where the flashlight is
             const veilMaskStr = `radial-gradient(circle at calc(50% + ${dx}px) calc(50% + ${dy}px), transparent 0%, transparent ${r1}px, rgba(0,0,0,0.8) ${r2}px, black ${r3}px, black 100%)`;
             veil.style.maskImage = veilMaskStr;
             (veil.style as any).webkitMaskImage = veilMaskStr;
             
-            // Product is ONLY visible inside the flashlight beam, so anything that peeks out under transparent cloth edges isn't seen
-            const prodCont = section.querySelector(`[data-product-mask="${id}"]`) as HTMLElement;
+            const prodCont = productMaskMapRef.current[id];
             if (prodCont) {
                const prodMask = `radial-gradient(circle at ${lx}px ${ly}px, black 0%, black ${R_CLEAN + 20}px, transparent ${R_FALLOFF}px, transparent 100%)`;
                prodCont.style.maskImage = prodMask;
                (prodCont.style as any).webkitMaskImage = prodMask;
             }
 
-            const metaLayer = section.querySelector(`[data-metadata-container="${id}"]`) as HTMLElement;
+            const metaLayer = metaLayerMapRef.current[id];
             if (metaLayer) {
               const absDist = Math.sqrt(Math.pow(mx - (vRect.left + vRect.width/2), 2) + Math.pow(my - (vRect.top + vRect.height/2), 2));
               const intensity = Math.max(0, 1 - absDist / (R_FALLOFF * 1.5));
               metaLayer.style.opacity = `${Math.pow(intensity, 2)}`;
               metaLayer.style.pointerEvents = intensity > 0.8 ? 'auto' : 'none';
               
-              // Drive the local background mask here too
-              const bgMask = section.querySelector(`[data-product-background="${id}"]`) as HTMLElement;
+              const bgMask = bgMaskMapRef.current[id];
               if (bgMask) {
                 const mask = `radial-gradient(circle at ${lx}px ${ly}px, black 0%, black 100px, transparent 220px)`;
                 bgMask.style.maskImage = mask;
@@ -440,20 +455,15 @@ export function MerchGallery() {
           }
         });
 
-        // 5. Drive Special Masks (Text Ignition)
+        // 5. Drive Special Masks
         textMasksRef.current.forEach(textLayer => {
           const parent = textLayer.closest('[data-measure]') as HTMLElement;
           if (!parent) return;
-          
           const id = parent.getAttribute('data-measure');
-          let vRect = id ? cardRectsRef.current[id] : undefined;
-          
-          // Fallback measurement for elements outside product cards (like the section header)
-          if (!vRect) vRect = parent.getBoundingClientRect();
+          const vRect = id ? cardRectsRef.current[id] : parent.getBoundingClientRect();
           if (!vRect) return;
 
-          const lx = mx - vRect.left;
-          const ly = my - vRect.top;
+          const lx = mx - vRect.left, ly = my - vRect.top;
           const maskType = textLayer.getAttribute('data-text-mask');
           
           let r1 = R_CLEAN, r2 = R_GLOW, r3 = R_FALLOFF;
@@ -462,7 +472,6 @@ export function MerchGallery() {
           else if (maskType === 'glow-large') { r1 = R_CLEAN + 60; r2 = R_GLOW + 120; r3 = R_FALLOFF + 300; }
           else if (maskType === 'clean-large') { r1 = R_CLEAN + 30; r2 = R_GLOW + 60; r3 = R_FALLOFF + 150; }
 
-          // Chemical reaction proximity-based opacity for TITLES
           const distToCenter = Math.sqrt(Math.pow(lx - vRect.width/2, 2) + Math.pow(ly - vRect.height/2, 2));
           const revealIntensity = Math.max(0, 1 - distToCenter / (r3 * 1.8));
           textLayer.style.opacity = `${Math.pow(revealIntensity, 1.2)}`;
@@ -472,64 +481,42 @@ export function MerchGallery() {
           (textLayer.style as any).webkitMaskImage = mask;
         });
 
-        // 6. Easter Egg (Synced Discovery)
+        // 6. Easter Egg
         easterEggsRef.current.forEach((egg, idx) => {
           const id = `egg-${idx}`;
-          let eRect = eggRectsRef.current[id];
-          
-          // JIT Cache local recovery
-          if (!eRect) {
-            eRect = egg.getBoundingClientRect();
-            eggRectsRef.current[id] = eRect;
-          }
+          const eRect = eggRectsRef.current[id];
+          if (!eRect) return;
 
           const dist = Math.sqrt(Math.pow(mx - (eRect.left + eRect.width/2), 2) + Math.pow(my - (eRect.top + eRect.height/2), 2));
-          
-          const phosphor = egg.querySelector<HTMLElement>('[data-easter-layer="phosphor"]');
-          const real = egg.querySelector<HTMLElement>('[data-easter-layer="real"]');
-          const toast = egg.querySelector<HTMLElement>('[data-easter-toast]');
-          
-          const E_RADIUS = R_FALLOFF * 1.8; // More realistic, tighter discovery zone
+          const elCache = eggElementsMapRef.current[id];
+          if (!elCache) return;
+
+          const { phosphor, real, toast, aura } = elCache;
+          const E_RADIUS = R_FALLOFF * 1.8;
 
           if (dist < E_RADIUS) {
             const intensity = Math.max(0, 1 - dist/E_RADIUS);
-            const aura = egg.querySelector<HTMLElement>('[data-easter-layer="aura"]');
-            
             if (phosphor) {
               phosphor.style.opacity = `${0.2 + intensity * 0.8}`;
               phosphor.style.filter = `brightness(${0.8 + intensity * 1.5}) blur(${2 - intensity * 2}px)`;
             }
             if (real) {
               real.style.opacity = `${Math.pow(intensity, 1.4)}`;
-              // Golden Brilliance: High intensity adds a pure white core with a wide golden halo
               real.style.filter = `brightness(${1 + intensity * 0.8}) drop-shadow(0 0 ${20 + intensity * 80}px rgba(255, 191, 0, ${intensity * 0.7})) drop-shadow(0 0 ${10 + intensity * 30}px rgba(255, 255, 255, ${intensity * 0.9}))`;
             }
-
             if (aura) {
               aura.style.opacity = `${Math.pow(intensity, 2) * 0.8}`;
               aura.style.transform = `translate(-50%, -50%) scale(${1 + intensity * 0.4}) rotate(${intensity * 45}deg)`;
             }
-            
-            egg.style.transform = `scale(${0.98 + intensity * 0.07})`; // Subtler scale, no rotation
-            
+            egg.style.transform = `scale(${0.98 + intensity * 0.07})`;
             if (toast) {
               toast.style.opacity = `${Math.max(0, (intensity - 0.7) * 3.3)}`;
               toast.style.transform = `translateX(-50%) translateY(${-intensity * 20}px)`;
             }
           } else {
-            const aura = egg.querySelector<HTMLElement>('[data-easter-layer="aura"]');
-            if (phosphor) {
-              phosphor.style.opacity = '0.15';
-              phosphor.style.filter = 'brightness(0.6) blur(2px)';
-            }
-            if (real) {
-              real.style.opacity = '0';
-              real.style.filter = 'none';
-            }
-            if (aura) {
-              aura.style.opacity = '0';
-              aura.style.transform = 'translate(-50%, -50%) scale(1)';
-            }
+            if (phosphor) { phosphor.style.opacity = '0.15'; phosphor.style.filter = 'brightness(0.6) blur(2px)'; }
+            if (real) { real.style.opacity = '0'; real.style.filter = 'none'; }
+            if (aura) { aura.style.opacity = '0'; aura.style.transform = 'translate(-50%, -50%) scale(1)'; }
             egg.style.transform = 'scale(0.98)';
             if (toast) toast.style.opacity = '0';
           }
@@ -632,7 +619,6 @@ export function MerchGallery() {
               key={product.id} 
               product={product} 
               addItem={addItem} 
-              sectionRef={sectionRef} 
               onMeasure={handleMeasure} 
             />
           ))}

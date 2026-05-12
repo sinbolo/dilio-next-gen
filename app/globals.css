@@ -146,3 +146,25 @@ h1, h2, h3, h4, .display-lg, .display-md, .display-sm, .display-xs {
 [data-nextjs-static-indicator] {
   display: none !important;
 }
+
+/* --- PHASE 5: CONTENT VISIBILITY & STABILIZATION --- */
+/* These sections only render when near the viewport, saving CPU/RAM */
+#section-video,
+#section-merch,
+#section-6-contact,
+#section-tour {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 1000px; /* Placeholder size for scroll stability */
+}
+
+/* We EXPLICITLY avoid content-visibility on #section-music 
+   to ensure the SoundCloud iframe never unmounts/stops audio */
+#section-music {
+  content-visibility: visible !important;
+}
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
