@@ -82,7 +82,7 @@ export default function Home() {
       <section 
         id="section-1-hero" 
         ref={heroRef}
-        className="relative bg-transparent"
+        className="relative bg-[#ebebeb]"
       >
         <ScrollVideo totalFrames={329} />
         

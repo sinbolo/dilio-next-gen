@@ -141,20 +141,19 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
 
   return (
     <div ref={containerRef} className="relative w-full h-[200vh]">
-      <div className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden bg-white">
+      <div className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden bg-[#ebebeb]">
         <canvas
           ref={canvasRef}
           className="w-[85vw] h-[85vh] md:w-[65vw] md:h-[65vh] object-contain -translate-y-8 md:translate-y-0"
           style={{ 
             opacity: framesLoaded ? 1 : 0, 
-            transition: 'opacity 0.6s ease-in-out',
-            mixBlendMode: 'multiply' // Efficient hardware-accelerated "white removal"
+            transition: 'opacity 0.6s ease-in-out'
           }}
         />
         {/* Small non-blocking loader indicator — NOT fullscreen */}
         {!framesLoaded && (
           <div className="absolute inset-0 flex items-end justify-center pb-16 pointer-events-none">
-            <div className="w-4 h-4 border-2 border-black/20 border-t-black/50 rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-black/10 border-t-black/40 rounded-full animate-spin" />
           </div>
         )}
       </div>
