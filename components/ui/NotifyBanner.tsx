@@ -139,16 +139,32 @@ export function NotifyBanner({ isOpen, onClose, city }: NotifyBannerProps) {
                     transition={{ delay: 0.3 }}
                     className="text-[#22c55e] font-display text-base tracking-[0.4em] font-bold mb-3 uppercase"
                   >
-                    ACCESS GRANTED
+                    ACCESO CONCEDIDO
                   </motion.h4>
-                  
+
                   <motion.p 
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.4 }}
-                    className="text-white/40 text-[9px] uppercase tracking-[0.25em] font-mono max-w-[280px] leading-relaxed"
+                    className="text-white/40 text-[9px] uppercase tracking-[0.2em] font-mono max-w-[280px] leading-relaxed mb-2"
                   >
-                    You have been successfully added to our elite circle. Expect exclusive intelligence shortly.
+                    Has sido añadido a nuestro círculo exclusivo. Recibirás acceso prioritario en breve.
+                  </motion.p>
+
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: "30px" }}
+                    transition={{ delay: 0.55, duration: 0.5 }}
+                    className="h-px bg-[#22c55e]/20 my-3"
+                  />
+
+                  <motion.p 
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="text-white/25 text-[8px] uppercase tracking-[0.2em] font-mono max-w-[280px] leading-relaxed"
+                  >
+                    You have been added to our elite circle. Expect exclusive intelligence shortly.
                   </motion.p>
 
                   <motion.div 

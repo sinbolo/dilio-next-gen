@@ -204,14 +204,30 @@ export function ContactForm() {
               transition={{ delay: 0.2 }}
               className="text-2xl font-display tracking-[0.2em] mb-4 uppercase"
             >
-              INQUIRY RECEIVED
+              SOLICITUD RECIBIDA
             </motion.h3>
-            
-            <motion.p 
+
+            <motion.p
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="text-[10px] tracking-[0.3em] uppercase opacity-50 mb-8 max-w-[280px] leading-loose"
+              className="text-[9px] tracking-[0.25em] uppercase opacity-50 mb-2 max-w-[300px] leading-loose"
+            >
+              Nuestro equipo de management revisará tu solicitud con la máxima prioridad. Te hemos enviado un email de confirmación.
+            </motion.p>
+
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ delay: 0.45, duration: 0.6 }}
+              className="w-16 h-px bg-black/20 my-4"
+            />
+
+            <motion.p
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-[9px] tracking-[0.25em] uppercase opacity-40 mb-8 max-w-[300px] leading-loose"
             >
               Our management team will review your request with the highest priority. A confirmation email has been dispatched to your inbox.
             </motion.p>
@@ -219,11 +235,11 @@ export function ContactForm() {
             <motion.button
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.6 }}
               onClick={() => setStatus("idle")}
               className="text-[10px] tracking-[0.4em] uppercase border-b border-black py-1 hover:opacity-50 transition-opacity"
             >
-              CLOSE
+              CERRAR / CLOSE
             </motion.button>
           </motion.div>
         )}
@@ -234,7 +250,7 @@ export function ContactForm() {
         disabled={status === "loading" || !!emailError}
         className="bg-primary text-on-primary py-4 px-8 label-md w-full mt-4 hover:bg-black/80 transition-colors disabled:opacity-50"
       >
-        {status === "loading" ? "SENDING..." : "SUBMIT"}
+        {status === "loading" ? "ENVIANDO... / SENDING..." : "ENVIAR / SUBMIT"}
       </button>
     </form>
   );
