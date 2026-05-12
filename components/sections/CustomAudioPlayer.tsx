@@ -727,10 +727,12 @@ export function CustomAudioPlayer() {
                 fill 
                 className="object-contain" 
               />
-              <div 
-                className="absolute top-[48%] left-[49.5%] w-[8px] h-[8px] md:w-[14px] md:h-[14px] bg-red-600 rounded-full shadow-[0_0_120px_#ff0000,0_0_60px_#ff0000] z-[160]"
-                style={{ transform: 'translate(-50%, -50%)', animation: 'led-blink 0.8s infinite alternate' }}
-              />
+              <div className="absolute top-[48%] left-[49.5%] z-[160]" style={{ transform: 'translate(-50%, -50%) scale(0.065)' }}>
+                <div 
+                  className="w-14 h-14 bg-red-600 rounded-full shadow-[0_0_120px_#ff0000,0_0_60px_#ff0000]"
+                  style={{ animation: 'led-blink 0.8s infinite alternate' }}
+                />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

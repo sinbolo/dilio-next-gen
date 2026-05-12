@@ -92,22 +92,32 @@ export function BioSection() {
                 initial={{ opacity: 0 }}
                 whileInView={{ 
                   opacity: [
-                    1, 1, 0, 1, 0, 0, 0, // Strictly Off when On flickers
-                    0, 0,                // Stay Off when On is on
-                    0, 1, 0, 1,          // Strictly Off when On flickers off
-                    1, 1                 // Stay On (as base) when On is off
+                    1, 1, // 0, 0.02 (OFF)
+                    0, 0, // 0.021, 0.03 (ON)
+                    1, 1, // 0.031, 0.04 (OFF)
+                    0, 0, // 0.041, 0.05 (ON)
+                    0, 0, // 0.051, 0.06 (ON 0.3)
+                    0, 0, // 0.061, 0.54 (ON 1)
+                    1, 1, // 0.541, 0.55 (OFF)
+                    0, 0, // 0.551, 0.57 (ON 0.5)
+                    1, 1  // 0.571, 1 (OFF)
                   ]
                 }}
                 transition={{ 
                   duration: 8.5,
                   repeat: Infinity,
                   times: [
-                    0, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, // Power On phase
-                    0.1, 0.53,                                // Stay On phase
-                    0.54, 0.55, 0.57, 0.59,                    // Power Off phase
-                    0.65, 1                                    // Stay Off phase
+                    0, 0.02,
+                    0.021, 0.03,
+                    0.031, 0.04,
+                    0.041, 0.05,
+                    0.051, 0.06,
+                    0.061, 0.54,
+                    0.541, 0.55,
+                    0.551, 0.57,
+                    0.571, 1
                   ],
-                  ease: "easeInOut"
+                  ease: "linear"
                 }}
               />
               
@@ -116,34 +126,54 @@ export function BioSection() {
                 className="absolute inset-0"
                 animate={{ 
                   opacity: [
-                    0, 0, 1, 0, 1, 0.3, 1, // Power On Flicker (0.5s)
-                    1, 1,                   // Stay On (4s)
-                    1, 0, 0.5, 0,           // Power Off Flicker (0.5s)
-                    0, 0                    // Stay Off (3.5s)
+                    0, 0,       // OFF
+                    1, 1,       // ON
+                    0, 0,       // OFF
+                    1, 1,       // ON
+                    0.3, 0.3,   // ON (0.3)
+                    1, 1,       // ON (1)
+                    0, 0,       // OFF
+                    0.5, 0.5,   // ON (0.5)
+                    0, 0        // OFF
                   ],
                   scale: [
-                    1, 1, 1.05, 1.02, 1.05, 1.03, 1.05, // Subtle scale up during flicker
-                    1.05, 1.05,                         // Stay slightly larger
-                    1.05, 1.02, 1.03, 1,                // Scale back
-                    1, 1                                // Stay at base scale
+                    1, 1,       // OFF
+                    1.05, 1.05, // ON
+                    1, 1,       // OFF
+                    1.05, 1.05, // ON
+                    1.03, 1.03, // ON (0.3)
+                    1.05, 1.05, // ON (1)
+                    1, 1,       // OFF
+                    1.03, 1.03, // ON (0.5)
+                    1, 1        // OFF
                   ],
                   x: [
-                    0, 0, 30, 25, 30, 27, 30, // Shift right during flicker
-                    30, 30,                   // Stay shifted
-                    30, 25, 27, 0,            // Shift back
-                    0, 0                      // Stay at base position
+                    0, 0,       // OFF
+                    30, 30,     // ON
+                    0, 0,       // OFF
+                    30, 30,     // ON
+                    27, 27,     // ON (0.3)
+                    30, 30,     // ON (1)
+                    0, 0,       // OFF
+                    27, 27,     // ON (0.5)
+                    0, 0        // OFF
                   ]
                 }}
                 transition={{ 
                   duration: 8.5,
                   repeat: Infinity,
                   times: [
-                    0, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, // Power On
-                    0.1, 0.53,                                // Stay On
-                    0.54, 0.55, 0.57, 0.59,                    // Power Off
-                    0.65, 1                                    // Stay Off
+                    0, 0.02,
+                    0.021, 0.03,
+                    0.031, 0.04,
+                    0.041, 0.05,
+                    0.051, 0.06,
+                    0.061, 0.54,
+                    0.541, 0.55,
+                    0.551, 0.57,
+                    0.571, 1
                   ],
-                  ease: "easeInOut"
+                  ease: "linear"
                 }}
               >
                 <img 
