@@ -127,8 +127,8 @@ export default function Home() {
         <CustomAudioPlayer />
       </SmartSection>
 
-      {/* Section 4 - Video Grid (Rule 3.A: Persistent for PiP) */}
-      <SmartSection id="section-video" minHeight="1000px" isPersistent={true}>
+      {/* Section 4 - Video Grid (Rule 3.A: Persistent ONLY if PiP is active) */}
+      <SmartSection id="section-video" minHeight="1000px">
         <VideoGrid />
       </SmartSection>
 
