@@ -57,6 +57,8 @@ export function CustomAudioPlayer() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  const userWantsToPlay = useRef(false);
+
   // SoundCloud Widget Logic
   useEffect(() => {
     if (!mounted) return;
@@ -75,9 +77,24 @@ export function CustomAudioPlayer() {
           widget.getDuration((d: number) => setDuration(d));
         });
 
-        widget.bind(window.SC.Widget.Events.PLAY, () => setIsPlaying(true));
-        widget.bind(window.SC.Widget.Events.PAUSE, () => setIsPlaying(false));
-        widget.bind(window.SC.Widget.Events.FINISH, () => setIsPlaying(false));
+        widget.bind(window.SC.Widget.Events.PLAY, () => {
+          setIsPlaying(true);
+        });
+        
+        widget.bind(window.SC.Widget.Events.PAUSE, () => {
+          if (userWantsToPlay.current) {
+            // Unexpected pause (lag, buffering, or mobile block)
+            // Retry playing to force the stream
+            setTimeout(() => widget.play(), 200);
+          } else {
+            setIsPlaying(false);
+          }
+        });
+        
+        widget.bind(window.SC.Widget.Events.FINISH, () => {
+          userWantsToPlay.current = false;
+          setIsPlaying(false);
+        });
         
         widget.bind(window.SC.Widget.Events.PLAY_PROGRESS, (p: any) => {
           const ms = p.currentPosition;
@@ -122,6 +139,7 @@ export function CustomAudioPlayer() {
   const loadTrack = (id: number) => {
     setIsConnecting(id);
     setIsPlaying(false);
+    userWantsToPlay.current = false;
     widgetRef.current?.pause();
 
     setTimeout(() => {
@@ -272,6 +290,7 @@ export function CustomAudioPlayer() {
         <div 
           onClick={() => {
             if (isConnecting || isPlaying || !isReady) return;
+            userWantsToPlay.current = true;
             setIsPlaying(true);
             widgetRef.current?.play();
           }}
@@ -523,6 +542,7 @@ export function CustomAudioPlayer() {
         <div 
           onClick={() => {
             if (isConnecting) return;
+            userWantsToPlay.current = false;
             widgetRef.current?.pause();
             widgetRef.current?.seekTo(0);
             setIsPlaying(false);
@@ -550,9 +570,11 @@ export function CustomAudioPlayer() {
           onClick={() => {
             if (isConnecting || !isReady) return;
             if (isPlaying) {
+              userWantsToPlay.current = false;
               widgetRef.current?.pause();
               setIsPlaying(false);
             } else {
+              userWantsToPlay.current = true;
               // Force immediate UI feedback to avoid "movement and stop" lag
               setIsPlaying(true);
               widgetRef.current?.play();
