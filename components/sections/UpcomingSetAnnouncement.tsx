@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { X, MapPin, Calendar, Radio, Copy, Mail, Check, CalendarPlus } from "lucide-react";
 
-export function UpcomingSetAnnouncement({ forceOpen, onOpenChange }: { forceOpen?: boolean, onOpenChange?: (open: boolean) => void }) {
+export function UpcomingSetAnnouncement({ forceOpen, onOpenChange, suppressAutoOpen }: { forceOpen?: boolean, onOpenChange?: (open: boolean) => void, suppressAutoOpen?: boolean }) {
   const [isVisible, setIsVisible] = useState(false);
   const [hasShown, setHasShown] = useState(false);
   const [lang, setLang] = useState<"es" | "en">("es");
@@ -23,6 +23,12 @@ export function UpcomingSetAnnouncement({ forceOpen, onOpenChange }: { forceOpen
       // If manually closed or internally closed, we could notify parent if needed
     }
   }, [isVisible, onOpenChange]);
+
+  const suppressRef = useRef(suppressAutoOpen);
+  useEffect(() => {
+    suppressRef.current = suppressAutoOpen;
+  }, [suppressAutoOpen]);
+
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const eventAddress = "https://maps.app.goo.gl/vzRPwSzFfowStQAx6";
@@ -57,7 +63,17 @@ export function UpcomingSetAnnouncement({ forceOpen, onOpenChange }: { forceOpen
               if (sectionRef.current) {
                 const rect = sectionRef.current.getBoundingClientRect();
                 const isStillInView = rect.top < window.innerHeight && rect.bottom > 0;
-                if (isStillInView) {
+                
+                const bookingSection = document.getElementById('section-6-contact');
+                let isBookingInView = false;
+                if (bookingSection) {
+                  const bRect = bookingSection.getBoundingClientRect();
+                  if (bRect.top < window.innerHeight * 0.8 && bRect.bottom > window.innerHeight * 0.2) {
+                    isBookingInView = true;
+                  }
+                }
+
+                if (isStillInView && !suppressRef.current && !isBookingInView) {
                   setIsVisible(true);
                   setHasShown(true);
                 }

@@ -157,6 +157,7 @@ export function TourSection() {
       <UpcomingSetAnnouncement 
         forceOpen={isManualAnnouncementOpen} 
         onOpenChange={setIsManualAnnouncementOpen} 
+        suppressAutoOpen={isNotifyOpen}
       />
 
       {/* Responsive Immersive Background */}
