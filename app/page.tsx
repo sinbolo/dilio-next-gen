@@ -79,36 +79,38 @@ export default function Home() {
       <BookingWidget />
 
       {/* Hero Section with ScrollVideo */}
-      <SmartSection id="section-1-hero" minHeight="100vh">
-        <div ref={heroRef} className="relative w-full h-full">
-          <ScrollVideo totalFrames={329} />
-          
-          {/* Cinematic Text Overlays */}
-          <div className="fixed inset-0 pointer-events-none z-20 flex flex-col items-center justify-center p-12 md:p-20">
-            <motion.div 
-              style={{ 
-                opacity: textOpacity2, 
-                y: textY2,
-                color: textColor2,
-                textShadow: textGlow2,
-                filter: useTransform(textBlur2, (v) => `blur(${v}px)`)
-              }}
-              className="flex flex-col items-center text-center"
-            >
-              <h2 className="display-md mb-2">HOUSE MÚSIC</h2>
-            </motion.div>
+      <section 
+        id="section-1-hero" 
+        ref={heroRef}
+        className="relative bg-transparent"
+      >
+        <ScrollVideo totalFrames={329} />
+        
+        {/* Cinematic Text Overlays */}
+        <div className="fixed inset-0 pointer-events-none z-20 flex flex-col items-center justify-center p-12 md:p-20">
+          <motion.div 
+            style={{ 
+              opacity: textOpacity2, 
+              y: textY2,
+              color: textColor2,
+              textShadow: textGlow2,
+              filter: useTransform(textBlur2, (v) => `blur(${v}px)`)
+            }}
+            className="flex flex-col items-center text-center"
+          >
+            <h2 className="display-md mb-2">HOUSE MÚSIC</h2>
+          </motion.div>
 
-            <motion.div 
-              style={{ opacity: textOpacity3 }}
-              className="absolute bottom-12 md:bottom-20 flex justify-center w-full"
-            >
-              <span className="label-xs tracking-[0.3em] text-center max-w-md">
-                SOUND & ART
-              </span>
-            </motion.div>
-          </div>
+          <motion.div 
+            style={{ opacity: textOpacity3 }}
+            className="absolute bottom-12 md:bottom-20 flex justify-center w-full"
+          >
+            <span className="label-xs tracking-[0.3em] text-center max-w-md">
+              SOUND & ART
+            </span>
+          </motion.div>
         </div>
-      </SmartSection>
+      </section>
 
       {/* Section 2 - Creative Navigation */}
       <SmartSection id="section-2-creative" minHeight="100vh">

@@ -56,9 +56,7 @@ export function SmartSection({
         minHeight,
         // Rule 2: content-visibility for browser-level optimization
         contentVisibility: isPersistent ? 'visible' : 'auto',
-        containIntrinsicSize: `1px ${minHeight}`,
-        // GPU stabilization
-        transform: 'translate3d(0,0,0)'
+        containIntrinsicSize: `1px ${minHeight}`
       } as any}
     >
       {shouldRenderContent ? (
