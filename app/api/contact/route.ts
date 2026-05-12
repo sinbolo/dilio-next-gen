@@ -13,7 +13,7 @@ const contactSchema = z.object({
   message: z.string().min(10).max(500),
 });
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_DrFCN8sF_MNHDEUoK4voS4hTXdk3YCcXt';
 const LOGO_URL = "https://www.dilio.es/assets/logo_bio_off_clean.png";
 const DESTINATION_EMAIL = "booking@dilio.es";
 
@@ -34,6 +34,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, message: "Mock success (API Key missing)" }, { status: 200 });
     }
 
+    const FROM_EMAIL = process.env.EMAIL_FROM_BOOKING || 'DILIO Management <booking@dilio.es>';
+
     // 1. Send email to DILIO Management (Booking Notification)
     const adminRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -42,8 +44,9 @@ export async function POST(req: Request) {
         'Authorization': `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'DILIO Booking <onboarding@resend.dev>',
+        from: FROM_EMAIL,
         to: DESTINATION_EMAIL,
+        reply_to: validatedData.email,
         subject: `NEW BOOKING INQUIRY: ${validatedData.email}`,
         html: getBookingEmailHtml(LOGO_URL, validatedData),
       }),
@@ -63,7 +66,7 @@ export async function POST(req: Request) {
         'Authorization': `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'DILIO Management <onboarding@resend.dev>',
+        from: FROM_EMAIL,
         to: validatedData.email,
         subject: 'Booking Inquiry Received - DILIO',
         html: getBookingConfirmationEmailHtml(LOGO_URL, validatedData.message),

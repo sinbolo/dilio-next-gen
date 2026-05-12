@@ -12,7 +12,7 @@ const subscribeSchema = z.object({
   email: z.string().email(),
 });
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_DrFCN8sF_MNHDEUoK4voS4hTXdk3YCcXt';
 const LOGO_URL = "https://www.dilio.es/assets/logo_bio_off_clean.png";
 const NOTIFY_ADMIN_EMAIL = "realdiliomusic@gmail.com";
 
@@ -33,7 +33,35 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, message: "Mock success (API Key missing)" }, { status: 200 });
     }
 
-    // Send welcome email to the Fan
+    const FROM_EMAIL = process.env.EMAIL_FROM_TOUR || 'DILIO <info@dilio.es>';
+    const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID;
+
+    // 1. Add to Resend Audience (DILIO Fans)
+    if (AUDIENCE_ID) {
+      try {
+        const audienceRes = await fetch(`https://api.resend.com/audiences/${AUDIENCE_ID}/contacts`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${RESEND_API_KEY}`,
+          },
+          body: JSON.stringify({
+            email: validatedData.email,
+            unsubscribed: false,
+          }),
+        });
+
+        if (!audienceRes.ok) {
+          const error = await audienceRes.json();
+          console.error("Resend Audience Error:", error);
+          // We don't block the welcome email if audience sync fails, but we log it.
+        }
+      } catch (e) {
+        console.error("Failed to add contact to audience:", e);
+      }
+    }
+
+    // 2. Send welcome email to the Fan
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -41,7 +69,7 @@ export async function POST(req: Request) {
         'Authorization': `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'DILIO <onboarding@resend.dev>',
+        from: FROM_EMAIL,
         to: validatedData.email,
         subject: 'EXCLUSIVE ACCESS: DILIO THE SESSIONS',
         html: getWelcomeEmailHtml(LOGO_URL),
@@ -49,12 +77,12 @@ export async function POST(req: Request) {
     });
 
     if (!res.ok) {
-      const error = await res.json();
-      console.error("Resend error:", error);
-      throw new Error("Failed to send welcome email");
+      const errorBody = await res.json();
+      console.error("Resend error (status", res.status, "):", JSON.stringify(errorBody));
+      throw new Error(`Failed to send welcome email: ${errorBody?.message || res.status}`);
     }
 
-    // Notify Admin about new subscriber
+    // 3. Notify Admin about new subscriber
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -62,7 +90,7 @@ export async function POST(req: Request) {
         'Authorization': `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'DILIO System <onboarding@resend.dev>',
+        from: FROM_EMAIL,
         to: NOTIFY_ADMIN_EMAIL,
         subject: 'NUEVO SUSCRIPTOR EN DILIO.ES',
         html: `<p>Nuevo fan suscrito: <b>${validatedData.email}</b></p>`,
