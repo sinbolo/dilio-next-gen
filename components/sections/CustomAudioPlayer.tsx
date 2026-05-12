@@ -672,7 +672,7 @@ export function CustomAudioPlayer() {
               key={`connecting-${isConnecting}`}
               className="absolute z-[150] pointer-events-none flex items-center justify-center"
               style={{ 
-                top: '26.00%',
+                top: '35.00%',
                 left: isConnecting === 1 ? '28.63%' : '29.48%',
                 width: '6.5%', 
                 aspectRatio: '16/9'
@@ -713,7 +713,7 @@ export function CustomAudioPlayer() {
               transition={{ duration: 0.1 }}
               className="absolute z-[140] pointer-events-none flex items-center justify-center"
               style={{ 
-                top: '26.00%',
+                top: '35.00%',
                 left: activeUsb === 1 ? '28.63%' : '29.48%',
                 width: '6.5%', 
                 aspectRatio: '16/9',
