@@ -264,7 +264,8 @@ export function CustomAudioPlayer() {
         {/* --- LCD SCREEN OVERLAY --- */}
         <div 
           onClick={() => {
-            if (isConnecting) return;
+            if (isConnecting || isPlaying) return;
+            setIsPlaying(true);
             widgetRef.current?.play();
           }}
           className={`absolute top-[10.5%] left-[37.7%] w-[24.5%] h-[26.5%] ${isMobile ? '' : 'overflow-hidden'} rounded-[2px] cursor-pointer z-40 flex flex-col group bg-[#020406] shadow-[inset_0_0_20px_rgba(0,0,0,0.9)]`}
@@ -543,7 +544,10 @@ export function CustomAudioPlayer() {
             if (isConnecting) return;
             if (isPlaying) {
               widgetRef.current?.pause();
+              setIsPlaying(false);
             } else {
+              // Force immediate UI feedback to avoid "movement and stop" lag
+              setIsPlaying(true);
               widgetRef.current?.play();
             }
           }}

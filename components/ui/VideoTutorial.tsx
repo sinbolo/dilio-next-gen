@@ -10,6 +10,14 @@ export function VideoTutorial() {
   const [lang, setLang] = useState<'en' | 'es'>('es'); // Default to Spanish as per site preference
   const [hasPassedHero, setHasPassedHero] = useState(false);
   const [hasShownOnce, setHasShownOnce] = useState(false);
+
+  useEffect(() => {
+    const shown = localStorage.getItem('dilio_video_tutorial_shown');
+    if (shown === 'true') {
+      setHasShownOnce(true);
+    }
+  }, []);
+
   const [isFast, setIsFast] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { scrollY } = useScroll();
@@ -59,6 +67,7 @@ export function VideoTutorial() {
         setIsVisible(false);
         setShowGlint(true);
         setHasShownOnce(true);
+        localStorage.setItem('dilio_video_tutorial_shown', 'true');
       }, duration);
       return () => {
         if (autoCloseRef.current) clearTimeout(autoCloseRef.current);

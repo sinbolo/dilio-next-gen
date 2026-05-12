@@ -33,7 +33,7 @@ export function SmartSection({
     setIsMobile(window.innerWidth < 768);
   }, []);
 
-  const memoryMargin = isMobile ? "300px" : "2000px";
+  const memoryMargin = isMobile ? "40px" : "2000px";
 
   const isInMemoryRange = useInView(ref, { 
     amount: "some",

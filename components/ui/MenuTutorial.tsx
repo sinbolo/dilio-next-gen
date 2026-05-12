@@ -11,6 +11,14 @@ export function MenuTutorial() {
   const [hasPassedHero, setHasPassedHero] = useState(false);
   const [isFast, setIsFast] = useState(false);
   const [hasShownOnce, setHasShownOnce] = useState(false);
+
+  useEffect(() => {
+    const shown = localStorage.getItem('dilio_menu_tutorial_shown');
+    if (shown === 'true') {
+      setHasShownOnce(true);
+    }
+  }, []);
+
   const [isMobile, setIsMobile] = useState(false);
   
   const { scrollY } = useScroll();
@@ -58,6 +66,7 @@ export function MenuTutorial() {
         setIsVisible(false);
         setShowGlint(true);
         setHasShownOnce(true);
+        localStorage.setItem('dilio_menu_tutorial_shown', 'true');
       }, duration);
       return () => {
         if (autoCloseRef.current) clearTimeout(autoCloseRef.current);

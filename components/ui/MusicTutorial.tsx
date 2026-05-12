@@ -8,6 +8,14 @@ export function MusicTutorial() {
   const [isVisible, setIsVisible] = useState(false);
   const [showGlint, setShowGlint] = useState(false);
   const [hasShownOnce, setHasShownOnce] = useState(false);
+
+  useEffect(() => {
+    const shown = localStorage.getItem('dilio_music_tutorial_shown');
+    if (shown === 'true') {
+      setHasShownOnce(true);
+    }
+  }, []);
+
   const [isFast, setIsFast] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const ref = useRef(null);
@@ -60,6 +68,7 @@ export function MusicTutorial() {
         setIsVisible(false);
         setShowGlint(true);
         setHasShownOnce(true);
+        localStorage.setItem('dilio_music_tutorial_shown', 'true');
       }, duration);
       return () => {
         if (autoCloseRef.current) clearTimeout(autoCloseRef.current);

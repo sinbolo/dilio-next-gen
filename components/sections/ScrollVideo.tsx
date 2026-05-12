@@ -34,9 +34,11 @@ export const ScrollVideo: React.FC<ScrollVideoProps> = ({ totalFrames }) => {
   // 1. Shadow Range Observer: Pre-load frames before they are in view
   const [isNearView, setIsNearView] = useState(false);
   useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    const memoryMargin = isMobile ? "40px" : "1000px";
     const observer = new IntersectionObserver(
       ([entry]) => setIsNearView(entry.isIntersecting),
-      { rootMargin: "1000px 0px 1000px 0px" } // Rule C: 1000px pre-load
+      { rootMargin: `${memoryMargin} 0px ${memoryMargin} 0px` } 
     );
     if (containerRef.current) observer.observe(containerRef.current);
     return () => observer.disconnect();

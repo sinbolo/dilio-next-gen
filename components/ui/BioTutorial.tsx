@@ -9,6 +9,14 @@ export function BioTutorial() {
   const [showGlint, setShowGlint] = useState(false);
   const [lang, setLang] = useState<'en' | 'es'>('es');
   const [hasShownOnce, setHasShownOnce] = useState(false);
+
+  useEffect(() => {
+    const shown = localStorage.getItem('dilio_bio_tutorial_shown');
+    if (shown === 'true') {
+      setHasShownOnce(true);
+    }
+  }, []);
+
   const [isFast, setIsFast] = useState(false);
   const { scrollY } = useScroll();
   const ref = useRef(null);
@@ -61,6 +69,7 @@ export function BioTutorial() {
         setIsVisible(false);
         setShowGlint(true);
         setHasShownOnce(true);
+        localStorage.setItem('dilio_bio_tutorial_shown', 'true');
       }, duration);
       return () => {
         if (autoCloseRef.current) clearTimeout(autoCloseRef.current);

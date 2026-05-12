@@ -102,6 +102,14 @@ export function MerchTutorial() {
   const [showSpark, setShowSpark] = useState(false);
   const [lang, setLang] = useState<'en' | 'es'>('es');
   const [hasShownOnce, setHasShownOnce] = useState(false);
+
+  useEffect(() => {
+    const shown = localStorage.getItem('dilio_merch_tutorial_shown');
+    if (shown === 'true') {
+      setHasShownOnce(true);
+    }
+  }, []);
+
   const [isMobile, setIsMobile] = useState(false);
   const { scrollY } = useScroll();
   const [hasPassedHero, setHasPassedHero] = useState(false);
@@ -150,6 +158,7 @@ export function MerchTutorial() {
         setIsVisible(false);
         setShowSpark(true);
         setHasShownOnce(true);
+        localStorage.setItem('dilio_merch_tutorial_shown', 'true');
       }, 12000);
       return () => clearTimers();
     }
