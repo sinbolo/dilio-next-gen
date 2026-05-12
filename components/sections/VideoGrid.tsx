@@ -57,9 +57,19 @@ const videos = [
   }
 ];
 
-export function VideoGrid() {
+interface VideoGridProps {
+  onPipChange?: (isPip: boolean) => void;
+}
+
+export function VideoGrid({ onPipChange }: VideoGridProps = {}) {
   const [activeVideo, setActiveVideo] = useState<typeof videos[0] | null>(videos[0]);
-  const [isPip, setIsPip] = useState(false);
+  const [isPip, _setIsPip] = useState(false);
+  const isPipRef = useRef(false);
+  const setIsPip = (val: boolean) => {
+    isPipRef.current = val;
+    _setIsPip(val);
+    if (onPipChange) onPipChange(val);
+  };
   const [pipDismissed, _setPipDismissed] = useState(false);
   const pipDismissedRef = useRef(false);
   const setPipDismissed = (val: boolean) => {
@@ -77,9 +87,10 @@ export function VideoGrid() {
   const [currentTime, setCurrentTime] = useState('');
   const isPlayingRef = useRef(false);
   const playStartRef = useRef<number | null>(null);
-  const sectionRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoSlotRef = useRef<HTMLDivElement>(null);
-  const [videoPos, setVideoPos] = useState({ top: 0, left: 0, width: 0, height: 0 });
+  const portalRef = useRef<HTMLDivElement>(null);
+  const videoPosRef = useRef({ top: 0, left: 0, width: 0, height: 0 });
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -102,21 +113,52 @@ export function VideoGrid() {
   const updateVideoPos = () => {
     if (!videoSlotRef.current) return;
     const r = videoSlotRef.current.getBoundingClientRect();
-    setVideoPos({ top: r.top, left: r.left, width: r.width, height: r.height });
+    videoPosRef.current = { top: r.top, left: r.left, width: r.width, height: r.height };
+    
+    if (portalRef.current && !isPipRef.current) {
+      portalRef.current.style.top = `${r.top}px`;
+      portalRef.current.style.left = `${r.left}px`;
+      portalRef.current.style.width = `${r.width}px`;
+      portalRef.current.style.height = `${r.height}px`;
+    }
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      const isOutOfView = rect.bottom < 100 || rect.top > window.innerHeight - 100;
-      if (isOutOfView) {
-        if (!pipDismissedRef.current && isPlayingRef.current) setIsPip(true);
-      } else {
-        setIsPip(false);
-        setPipDismissed(false);
-      }
+    if (!isPip) {
       updateVideoPos();
+    }
+  }, [isPip, activeVideo]);
+
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (!containerRef.current) {
+            ticking = false;
+            return;
+          }
+          const rect = containerRef.current.getBoundingClientRect();
+          const isOutOfView = rect.bottom < 150 || rect.top > window.innerHeight - 150;
+          
+          if (isOutOfView) {
+            if (!pipDismissedRef.current && isPlayingRef.current && !isPipRef.current) {
+              setIsPip(true);
+            }
+          } else {
+            if (isPipRef.current) {
+              setIsPip(false);
+              setPipDismissed(false);
+            }
+          }
+          
+          if (!isPipRef.current) {
+            updateVideoPos();
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("resize", updateVideoPos, { passive: true });
@@ -252,7 +294,7 @@ export function VideoGrid() {
   };
 
   return (
-    <section ref={sectionRef} id="section-video" className="min-h-screen relative flex items-center justify-center bg-black text-white py-[120px] overflow-hidden">
+    <section id="section-video" className="min-h-screen relative flex items-center justify-center bg-black text-white py-[120px] overflow-hidden">
       <VideoTutorial />
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -265,6 +307,7 @@ export function VideoGrid() {
 
         {/* Floating iPad Mockup */}
         <div 
+          ref={containerRef}
           className="relative w-full max-w-[1200px] aspect-[9/42] md:aspect-[16/10] bg-[#1a1a1a] rounded-[2rem] md:rounded-[3rem] p-3 md:p-[22px] shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_30px_60px_rgba(0,0,0,0.8),inset_0_0_0_2px_#333,inset_0_0_20px_rgba(0,0,0,1)] ring-1 ring-black"
         >
           {/* Metallic Edge Highlight */}
@@ -579,6 +622,7 @@ export function VideoGrid() {
           const pipH = Math.round(pipW * 9 / 16);
           return (
             <div
+              ref={portalRef}
               className="group"
               style={isPip ? {
                 position: 'fixed',
@@ -590,15 +634,17 @@ export function VideoGrid() {
                 borderRadius: '10px',
                 overflow: 'hidden',
                 boxShadow: '0 25px 60px rgba(0,0,0,0.9)',
+                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
               } : {
                 position: 'fixed',
-                top: `${videoPos.top}px`,
-                left: `${videoPos.left}px`,
-                width: `${videoPos.width}px`,
-                height: `${videoPos.height}px`,
+                top: `${videoPosRef.current.top}px`,
+                left: `${videoPosRef.current.left}px`,
+                width: `${videoPosRef.current.width}px`,
+                height: `${videoPosRef.current.height}px`,
                 zIndex: 50,
                 borderRadius: '12px',
                 overflow: 'hidden',
+                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
               }}
             >
               <iframe
