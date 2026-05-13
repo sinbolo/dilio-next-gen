@@ -54,6 +54,11 @@ export function TourSection() {
   }, []);
 
   useEffect(() => {
+    const event = new CustomEvent('notifyBannerStateChange', { detail: { isOpen: isNotifyOpen } });
+    window.dispatchEvent(event);
+  }, [isNotifyOpen]);
+
+  useEffect(() => {
     const handleScroll = () => {
       const scrolled = window.scrollY;
       const viewportHeight = window.innerHeight;

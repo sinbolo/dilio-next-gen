@@ -9,11 +9,17 @@ export function BookingWidget() {
   const [isContactInView, setIsContactInView] = useState(false);
   const [isHeroInView, setIsHeroInView] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isNotifyOpen, setIsNotifyOpen] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener("resize", checkMobile, { passive: true });
+
+    const handleNotifyChange = (e: any) => {
+      setIsNotifyOpen(e.detail.isOpen);
+    };
+    window.addEventListener('notifyBannerStateChange', handleNotifyChange);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -38,11 +44,12 @@ export function BookingWidget() {
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", checkMobile);
+      window.removeEventListener('notifyBannerStateChange', handleNotifyChange);
     };
   }, []);
 
-  // Show if NOT in contact section AND (if mobile, NOT in hero section)
-  const isVisible = !isContactInView && !(isMobile && isHeroInView);
+  // Show if NOT in contact section AND (if mobile, NOT in hero section) AND notify banner is NOT open
+  const isVisible = !isContactInView && !(isMobile && isHeroInView) && !isNotifyOpen;
 
   return (
     <AnimatePresence>
