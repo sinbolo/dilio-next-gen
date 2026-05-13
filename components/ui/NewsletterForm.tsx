@@ -9,6 +9,17 @@ export function NewsletterForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Prevent duplicate submissions due to browser background refresh
+    const lastSubmitted = localStorage.getItem("dilio_subscribe_last_submitted");
+    if (lastSubmitted) {
+      const timeSince = Date.now() - parseInt(lastSubmitted, 10);
+      if (timeSince < 12 * 60 * 60 * 1000) { // 12 hours
+        setStatus("success");
+        return;
+      }
+    }
+
     setStatus("loading");
 
     try {
@@ -20,6 +31,7 @@ export function NewsletterForm() {
 
       if (!res.ok) throw new Error("Failed to subscribe");
       
+      localStorage.setItem("dilio_subscribe_last_submitted", Date.now().toString());
       setStatus("success");
       setEmail("");
     } catch (err) {

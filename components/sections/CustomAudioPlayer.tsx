@@ -45,6 +45,7 @@ export function CustomAudioPlayer() {
   const [duration, setDuration] = useState(0);
   const widgetRef = useRef<any>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const silentAudioRef = useRef<HTMLAudioElement>(null);
 
   const [isReady, setIsReady] = useState(false);
 
@@ -113,6 +114,49 @@ export function CustomAudioPlayer() {
       }
     };
   }, [mounted]);
+
+  // Update Media Session Metadata for Lock Screen / OS controls
+  useEffect(() => {
+    if ('mediaSession' in navigator && isReady) {
+      const track = TRACKS[activeUsb as keyof typeof TRACKS];
+      if (track) {
+         navigator.mediaSession.metadata = new window.MediaMetadata({
+          title: `CDJ DILIO - ${track.name}`,
+          artist: `DILIO 🎧 [${track.artist}]`,
+          album: "LIVE PERFORMANCE HOUSE",
+          artwork: [
+            { src: 'https://www.dilio.es/assets/logo-dilio-1.png', sizes: '512x512', type: 'image/png' },
+            { src: 'https://www.dilio.es/assets/dilio-halftone.png', sizes: '512x512', type: 'image/png' }
+          ]
+        });
+
+        navigator.mediaSession.setActionHandler('play', () => {
+          widgetRef.current?.play();
+          setIsPlaying(true);
+        });
+        navigator.mediaSession.setActionHandler('pause', () => {
+          widgetRef.current?.pause();
+          setIsPlaying(false);
+        });
+        navigator.mediaSession.setActionHandler('previoustrack', () => {
+          handlePrevTrack();
+        });
+        navigator.mediaSession.setActionHandler('nexttrack', () => {
+          handleNextTrack();
+        });
+      }
+    }
+  }, [activeUsb, isReady]);
+
+  // Synchronize silent audio to maintain parent MediaSession control
+  useEffect(() => {
+    if (!silentAudioRef.current) return;
+    if (isPlaying) {
+      silentAudioRef.current.play().catch(e => console.warn("Silent audio play failed:", e));
+    } else {
+      silentAudioRef.current.pause();
+    }
+  }, [isPlaying]);
 
   const handleUsbClick = (id: number) => {
     if (activeUsb === id || isConnecting !== 0) return;
@@ -718,12 +762,23 @@ export function CustomAudioPlayer() {
         {/* SoundCloud Iframe (Hidden) */}
         <iframe
           ref={iframeRef}
+          title="CDJ DILIO"
           src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(TRACKS[1].url)}&color=%234ade80&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false`}
           className="opacity-0 pointer-events-none absolute w-px h-px"
           allow="autoplay"
         />
 
+        {/* Silent Audio Hack for Lock Screen Dominance */}
+        <audio 
+          ref={silentAudioRef} 
+          src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA==" 
+          loop 
+          preload="auto"
+          className="hidden"
+        />
+
         </div>
+
         <style>{`
           @keyframes led-blink {
             0% { opacity: 0.3; filter: brightness(1) drop-shadow(0 0 5px #ff0000); }

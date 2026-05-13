@@ -42,6 +42,7 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'X-Idempotency-Key': `admin-${validatedData.email}-${new Date().toISOString().split('T')[0]}`
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
@@ -49,6 +50,10 @@ export async function POST(req: Request) {
         reply_to: validatedData.email,
         subject: `NEW BOOKING INQUIRY: ${validatedData.email}`,
         html: getBookingEmailHtml(LOGO_URL, validatedData),
+        headers: {
+          'X-Auto-Response-Suppress': 'All',
+          'Auto-Submitted': 'auto-generated'
+        }
       }),
     });
 
@@ -64,12 +69,17 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'X-Idempotency-Key': `client-${validatedData.email}-${new Date().toISOString().split('T')[0]}`
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
         to: validatedData.email,
         subject: 'Booking Inquiry Received - DILIO',
         html: getBookingConfirmationEmailHtml(LOGO_URL, validatedData.message),
+        headers: {
+          'X-Auto-Response-Suppress': 'All',
+          'Auto-Submitted': 'auto-generated'
+        }
       }),
     });
 

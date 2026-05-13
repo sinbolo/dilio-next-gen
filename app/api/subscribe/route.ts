@@ -44,6 +44,7 @@ export async function POST(req: Request) {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${RESEND_API_KEY}`,
+            'X-Idempotency-Key': `audience-${validatedData.email}-${new Date().toISOString().split('T')[0]}`
           },
           body: JSON.stringify({
             email: validatedData.email,
@@ -67,12 +68,17 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'X-Idempotency-Key': `welcome-${validatedData.email}-${new Date().toISOString().split('T')[0]}`
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
         to: validatedData.email,
         subject: 'EXCLUSIVE ACCESS: DILIO THE SESSIONS',
         html: getWelcomeEmailHtml(LOGO_URL),
+        headers: {
+          'X-Auto-Response-Suppress': 'All',
+          'Auto-Submitted': 'auto-generated'
+        }
       }),
     });
 
@@ -88,12 +94,17 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'X-Idempotency-Key': `admin-notify-${validatedData.email}-${new Date().toISOString().split('T')[0]}`
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
         to: NOTIFY_ADMIN_EMAIL,
         subject: 'NUEVO SUSCRIPTOR EN DILIO.ES',
         html: `<p>Nuevo fan suscrito: <b>${validatedData.email}</b></p>`,
+        headers: {
+          'X-Auto-Response-Suppress': 'All',
+          'Auto-Submitted': 'auto-generated'
+        }
       }),
     });
 

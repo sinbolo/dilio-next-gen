@@ -63,6 +63,16 @@ export function ContactForm() {
       return;
     }
 
+    // Prevent duplicate submissions due to browser background refresh
+    const lastSubmitted = localStorage.getItem("dilio_contact_last_submitted");
+    if (lastSubmitted) {
+      const timeSince = Date.now() - parseInt(lastSubmitted, 10);
+      if (timeSince < 12 * 60 * 60 * 1000) { // 12 hours
+        setStatus("success");
+        return;
+      }
+    }
+
     setStatus("loading");
     setErrorMsg("");
 
@@ -86,6 +96,7 @@ export function ContactForm() {
         throw new Error("Failed to send message.");
       }
 
+      localStorage.setItem("dilio_contact_last_submitted", Date.now().toString());
       setStatus("success");
       (e.target as HTMLFormElement).reset();
       setEmailValue("");

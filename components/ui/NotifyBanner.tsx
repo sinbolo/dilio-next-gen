@@ -16,6 +16,21 @@ export function NotifyBanner({ isOpen, onClose, city }: NotifyBannerProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Prevent duplicate submissions due to browser background refresh
+    const lastSubmitted = localStorage.getItem("dilio_subscribe_last_submitted");
+    if (lastSubmitted) {
+      const timeSince = Date.now() - parseInt(lastSubmitted, 10);
+      if (timeSince < 12 * 60 * 60 * 1000) { // 12 hours
+        setStatus("success");
+        setTimeout(() => {
+          onClose();
+          setTimeout(() => setStatus("idle"), 500);
+        }, 3000);
+        return;
+      }
+    }
+
     setStatus("submitting");
     
     try {
@@ -27,6 +42,7 @@ export function NotifyBanner({ isOpen, onClose, city }: NotifyBannerProps) {
 
       if (!res.ok) throw new Error("Failed to subscribe");
       
+      localStorage.setItem("dilio_subscribe_last_submitted", Date.now().toString());
       setStatus("success");
       setEmail("");
       
