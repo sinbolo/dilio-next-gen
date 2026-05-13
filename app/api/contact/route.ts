@@ -63,7 +63,35 @@ export async function POST(req: Request) {
       throw new Error("Failed to send admin notification");
     }
 
-    // 2. Send professional confirmation to the Client
+    // 2. Send Short Alert to Personal Gmail (mendezz)
+    const PERSONAL_ALERT_EMAIL = "mendezz1324@gmail.com";
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const formattedTime = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'X-Idempotency-Key': `alert-${validatedData.email}-${new Date().toISOString().split('T')[0]}`
+      },
+      body: JSON.stringify({
+        from: FROM_EMAIL,
+        to: PERSONAL_ALERT_EMAIL,
+        subject: `AVISO: Solicitud de Booking - ${formattedDate}`,
+        html: `<p>Tienes una nueva solicitud de booking en dilio.es.</p>
+               <p><b>Fecha:</b> ${formattedDate}</p>
+               <p><b>Hora:</b> ${formattedTime}</p>
+               <p>Revisa el correo en <b>booking@dilio.es</b> para ver los detalles y responder.</p>`,
+        headers: {
+          'X-Auto-Response-Suppress': 'All',
+          'Auto-Submitted': 'auto-generated'
+        }
+      }),
+    });
+
+    // 3. Send professional confirmation to the Client
     const clientRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {

@@ -26,7 +26,7 @@ export function NotifyBanner({ isOpen, onClose, city }: NotifyBannerProps) {
         setTimeout(() => {
           onClose();
           setTimeout(() => setStatus("idle"), 500);
-        }, 3000);
+        }, 8000);
         return;
       }
     }
@@ -46,11 +46,11 @@ export function NotifyBanner({ isOpen, onClose, city }: NotifyBannerProps) {
       setStatus("success");
       setEmail("");
       
-      // Auto close after 3 seconds on success
+      // Auto close after 8 seconds on success
       setTimeout(() => {
         onClose();
         setTimeout(() => setStatus("idle"), 500);
-      }, 3000);
+      }, 8000);
     } catch (err) {
       console.error("Subscription error:", err);
       setStatus("idle");

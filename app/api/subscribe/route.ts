@@ -14,7 +14,7 @@ const subscribeSchema = z.object({
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_DrFCN8sF_MNHDEUoK4voS4hTXdk3YCcXt';
 const LOGO_URL = "https://www.dilio.es/assets/logo_bio_off_clean.png";
-const NOTIFY_ADMIN_EMAIL = "realdiliomusic@gmail.com";
+const NOTIFY_ADMIN_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || "info@dilio.es";
 
 export async function POST(req: Request) {
   try {
@@ -100,6 +100,7 @@ export async function POST(req: Request) {
         from: FROM_EMAIL,
         to: NOTIFY_ADMIN_EMAIL,
         subject: 'NUEVO SUSCRIPTOR EN DILIO.ES',
+        reply_to: validatedData.email,
         html: `<p>Nuevo fan suscrito: <b>${validatedData.email}</b></p>`,
         headers: {
           'X-Auto-Response-Suppress': 'All',

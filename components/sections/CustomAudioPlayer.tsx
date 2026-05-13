@@ -157,10 +157,34 @@ export function CustomAudioPlayer() {
   useEffect(() => {
     if ('mediaSession' in navigator) {
       navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
-      // Refresh metadata on play to ensure OS priority
-      if (isPlaying) updateMediaMetadata();
     }
-  }, [isPlaying]);
+    
+    // Aggressive metadata refresh to try and beat the iframe on iOS
+    let interval: NodeJS.Timeout;
+    if (isPlaying && isReady) {
+      // Immediate update
+      updateMediaMetadata();
+      // Periodic update (every 2s) to maintain dominance
+      interval = setInterval(updateMediaMetadata, 2000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isPlaying, activeUsb, isReady]);
+
+  // Sync document title for extra priority on some mobile browsers
+  useEffect(() => {
+    if (!mounted) return;
+    if (isPlaying) {
+      const track = TRACKS[activeUsb as keyof typeof TRACKS];
+      if (track) {
+        document.title = `▶ ${track.name} - CDJ DILIO`;
+      }
+    } else {
+      document.title = "DILIO | HOUSE MÚSIC";
+    }
+  }, [isPlaying, activeUsb, mounted]);
 
   const handleUsbClick = (id: number) => {
     if (activeUsb === id || isConnecting !== 0) return;
