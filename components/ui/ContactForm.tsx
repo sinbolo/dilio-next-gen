@@ -188,6 +188,15 @@ export function ContactForm() {
             50% { opacity: 0.2; }
           }
         `}</style>
+        {errorMsg && (
+          <motion.p 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-red-500 text-[0.7rem] font-bold mt-2 uppercase tracking-wider"
+          >
+            {errorMsg}
+          </motion.p>
+        )}
       </div>
       
       <AnimatePresence>
@@ -247,7 +256,12 @@ export function ContactForm() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6 }}
-              onClick={() => setStatus("idle")}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                setStatus("idle");
+                setErrorMsg("");
+              }}
               className="text-[10px] tracking-[0.4em] uppercase border-b border-black py-1 hover:opacity-50 transition-opacity"
             >
               CERRAR / CLOSE

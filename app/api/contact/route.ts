@@ -13,7 +13,7 @@ const contactSchema = z.object({
   message: z.string().min(10).max(500),
 });
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_DrFCN8sF_MNHDEUoK4voS4hTXdk3YCcXt';
 const LOGO_URL = "https://www.dilio.es/assets/logo_bio_off_clean.png";
 const DESTINATION_EMAIL = "booking@dilio.es";
 
@@ -38,6 +38,7 @@ export async function POST(req: Request) {
 
     // 1. Send email to DILIO Management (Booking Notification)
     const isTester = validatedData.email === 'mendezz1324@gmail.com';
+    if (isTester) console.log("Tester email detected, bypassing idempotency");
 
     const adminRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',

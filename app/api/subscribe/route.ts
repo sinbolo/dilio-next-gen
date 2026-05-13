@@ -12,7 +12,7 @@ const subscribeSchema = z.object({
   email: z.string().email(),
 });
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_DrFCN8sF_MNHDEUoK4voS4hTXdk3YCcXt';
 const LOGO_URL = "https://www.dilio.es/assets/logo_bio_off_clean.png";
 const NOTIFY_ADMIN_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || "info@dilio.es";
 
@@ -37,6 +37,7 @@ export async function POST(req: Request) {
     const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID;
 
     const isTester = validatedData.email === 'mendezz1324@gmail.com';
+    if (isTester) console.log("Tester email detected in subscribe, bypassing idempotency");
 
     // 1. Add to Resend Audience (DILIO Fans)
     if (AUDIENCE_ID) {
