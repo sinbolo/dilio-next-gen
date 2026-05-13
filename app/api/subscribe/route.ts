@@ -36,6 +36,8 @@ export async function POST(req: Request) {
     const FROM_EMAIL = process.env.EMAIL_FROM_TOUR || 'DILIO <info@dilio.es>';
     const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID;
 
+    const isTester = validatedData.email === 'mendezz1324@gmail.com';
+
     // 1. Add to Resend Audience (DILIO Fans)
     if (AUDIENCE_ID) {
       try {
@@ -44,7 +46,9 @@ export async function POST(req: Request) {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${RESEND_API_KEY}`,
-            'X-Idempotency-Key': `audience-${validatedData.email}-${new Date().toISOString().slice(0, 13)}`
+            'X-Idempotency-Key': isTester
+              ? `audience-test-${Date.now()}`
+              : `audience-${validatedData.email}-${new Date().toISOString().slice(0, 13)}`
           },
           body: JSON.stringify({
             email: validatedData.email,
@@ -68,7 +72,9 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'X-Idempotency-Key': `welcome-${validatedData.email}-${new Date().toISOString().slice(0, 13)}`
+        'X-Idempotency-Key': isTester
+          ? `welcome-test-${Date.now()}`
+          : `welcome-${validatedData.email}-${new Date().toISOString().slice(0, 13)}`
       },
       body: JSON.stringify({
         from: FROM_EMAIL,

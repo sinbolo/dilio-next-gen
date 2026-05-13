@@ -37,12 +37,16 @@ export async function POST(req: Request) {
     const FROM_EMAIL = process.env.EMAIL_FROM_BOOKING || 'DILIO Management <booking@dilio.es>';
 
     // 1. Send email to DILIO Management (Booking Notification)
+    const isTester = validatedData.email === 'mendezz1324@gmail.com';
+
     const adminRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'X-Idempotency-Key': `admin-${validatedData.email}-${new Date().toISOString().slice(0, 13)}`
+        'X-Idempotency-Key': isTester 
+          ? `admin-test-${Date.now()}`
+          : `admin-${validatedData.email}-${new Date().toISOString().slice(0, 13)}`
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
@@ -74,7 +78,7 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'X-Idempotency-Key': `alert-${validatedData.email}-${new Date().getTime()}`
+        'X-Idempotency-Key': `alert-${Date.now()}`
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
@@ -97,7 +101,9 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'X-Idempotency-Key': `client-${validatedData.email}-${new Date().toISOString().slice(0, 13)}`
+        'X-Idempotency-Key': isTester 
+          ? `client-test-${Date.now()}`
+          : `client-${validatedData.email}-${new Date().toISOString().slice(0, 13)}`
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
