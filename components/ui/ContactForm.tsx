@@ -29,6 +29,7 @@ export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [emailValue, setEmailValue] = useState("");
+  const [messageValue, setMessageValue] = useState("");
   const [emailError, setEmailError] = useState("");
 
   const validateEmailRealTime = (email: string) => {
@@ -64,10 +65,14 @@ export function ContactForm() {
     }
 
     // Prevent duplicate submissions due to browser background refresh
+    // BYPASS for tester email
+    const isTester = emailValue === 'mendezz1324@gmail.com';
     const lastSubmitted = localStorage.getItem("dilio_contact_last_submitted");
-    if (lastSubmitted) {
+    
+    if (lastSubmitted && !isTester) {
       const timeSince = Date.now() - parseInt(lastSubmitted, 10);
       if (timeSince < 12 * 60 * 60 * 1000) { // 12 hours
+        console.log("IDEMPOTENCY: Already submitted recently, skipping fetch.");
         setStatus("success");
         return;
       }
@@ -85,6 +90,7 @@ export function ContactForm() {
       // Client-side validation
       contactSchema.parse(data);
 
+      console.log("FETCHING /api/contact...");
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -98,8 +104,9 @@ export function ContactForm() {
 
       localStorage.setItem("dilio_contact_last_submitted", Date.now().toString());
       setStatus("success");
-      (e.target as HTMLFormElement).reset();
       setEmailValue("");
+      setMessageValue("");
+      if (e.target instanceof HTMLFormElement) e.target.reset();
     } catch (err: any) {
       setStatus("error");
       const zodError = err.errors?.[0]?.message;
@@ -176,6 +183,8 @@ export function ContactForm() {
           name="message"
           required 
           rows={4}
+          value={messageValue}
+          onChange={(e) => setMessageValue(e.target.value)}
           className="no-box-input py-3 w-full resize-none placeholder:italic placeholder:opacity-50" 
           placeholder={placeholder}
         />

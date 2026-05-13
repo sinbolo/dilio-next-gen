@@ -18,8 +18,9 @@ export function NotifyBanner({ isOpen, onClose, city }: NotifyBannerProps) {
     e.preventDefault();
 
     // Prevent duplicate submissions due to browser background refresh
+    const isTester = email.toLowerCase() === 'mendezz1324@gmail.com';
     const lastSubmitted = localStorage.getItem("dilio_subscribe_last_submitted");
-    if (lastSubmitted) {
+    if (lastSubmitted && !isTester) {
       const timeSince = Date.now() - parseInt(lastSubmitted, 10);
       if (timeSince < 12 * 60 * 60 * 1000) { // 12 hours
         setStatus("success");
