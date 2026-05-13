@@ -45,6 +45,8 @@ export function CustomAudioPlayer() {
   const [duration, setDuration] = useState(0);
   const widgetRef = useRef<any>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const oscillatorRef = useRef<OscillatorNode | null>(null);
 
   const [isReady, setIsReady] = useState(false);
 
@@ -153,24 +155,46 @@ export function CustomAudioPlayer() {
     }
   }, [activeUsb, isReady]);
 
-  // Sync playback state to MediaSession
+  // Sync playback state to MediaSession and Web Audio Silence
   useEffect(() => {
     if ('mediaSession' in navigator) {
       navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
     }
     
-    // Aggressive metadata refresh to try and beat the iframe on iOS
-    let interval: NodeJS.Timeout;
     if (isPlaying && isReady) {
-      // Immediate update
       updateMediaMetadata();
-      // Periodic update (every 2s) to maintain dominance
-      interval = setInterval(updateMediaMetadata, 2000);
+      
+      // Web Audio Silence Hack: iOS Safari needs the parent window 
+      // to produce 'audio' to own the MediaSession over the iframe.
+      try {
+        if (!audioCtxRef.current) {
+          audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        }
+        const ctx = audioCtxRef.current;
+        if (ctx.state === 'suspended') ctx.resume();
+        
+        if (!oscillatorRef.current) {
+          const oscillator = ctx.createOscillator();
+          const gain = ctx.createGain();
+          gain.gain.value = 0.001; 
+          oscillator.connect(gain);
+          gain.connect(ctx.destination);
+          oscillator.start();
+          oscillatorRef.current = oscillator;
+        }
+      } catch (e) {
+        console.warn("Web Audio silence failed:", e);
+      }
+    } else {
+      // Stop silence when paused
+      if (oscillatorRef.current) {
+        try {
+          oscillatorRef.current.stop();
+          oscillatorRef.current.disconnect();
+        } catch (e) {}
+        oscillatorRef.current = null;
+      }
     }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
   }, [isPlaying, activeUsb, isReady]);
 
   // Sync document title for extra priority on some mobile browsers
