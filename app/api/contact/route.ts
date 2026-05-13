@@ -16,6 +16,7 @@ const contactSchema = z.object({
 const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_DrFCN8sF_MNHDEUoK4voS4hTXdk3YCcXt';
 const LOGO_URL = "https://www.dilio.es/assets/logo_bio_off_clean.png";
 const DESTINATION_EMAIL = "booking@dilio.es";
+const ADMIN_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || "realdiliomusic@gmail.com";
 
 export async function POST(req: Request) {
   try {
@@ -51,7 +52,7 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
-        to: DESTINATION_EMAIL,
+        to: [DESTINATION_EMAIL, ADMIN_EMAIL],
         reply_to: validatedData.email,
         subject: `NEW BOOKING INQUIRY: ${validatedData.email}`,
         html: getBookingEmailHtml(LOGO_URL, validatedData),
