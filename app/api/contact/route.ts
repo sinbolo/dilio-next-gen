@@ -9,7 +9,21 @@ const limiter = rateLimit({
 });
 
 const contactSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email().refine((email) => {
+    const BLOCKED = ["yopmail.com","yopmail.fr","mailinator.com","mailinator.net",
+      "guerrillamail.com","guerrillamail.org","guerrillamail.net","guerrillamail.biz",
+      "guerrillamail.de","guerrillamail.info","sharklasers.com","grr.la",
+      "temp-mail.org","temp-mail.io","tempmail.com","tempmail.net","10minutemail.com",
+      "trashmail.com","trashmail.me","trashmail.net","trashmail.at","trashmail.io",
+      "maildrop.cc","mailnesia.com","discard.email","spamgourmet.com","spam4.me",
+      "msn.com","mail.ru","inbox.ru","list.ru","bk.ru","qq.com",
+      "throwaway.email","fakemailgenerator.com","fakeinbox.com","dispostable.com",
+      "getairmail.com","moakt.com","emailondeck.com","mytrashmail.com",
+      "live.cn","live.co.uk","spamavert.com","spamex.com","spamgap.com",
+    ];
+    const domain = email.split("@")[1]?.toLowerCase();
+    return domain ? !BLOCKED.includes(domain) : false;
+  }, { message: "Email domain not allowed. Please use a professional email." }),
   message: z.string().min(10).max(500),
 });
 

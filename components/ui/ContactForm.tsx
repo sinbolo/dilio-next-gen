@@ -4,23 +4,107 @@ import { useState, useEffect } from "react";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 
-const DISPOSABLE_DOMAINS = [
-  "temp-mail.org", "guerrillamail.com", "10minutemail.com", "yopmail.com",
-  "mailinator.com", "guerrillamail.org", "guerrillamail.net", "guerrillamail.biz",
-  "sharklasers.com", "grr.la", "guerrillamailblock.com", "dispostable.com",
-  "getairmail.com", "moakt.com", "tempmail.net", "emailondeck.com"
+// Comprehensive blocklist of spam, temporary, and low-quality email domains
+// Allows gmail, hotmail, outlook, icloud, and legitimate corporate domains
+const BLOCKED_DOMAINS = [
+  // --- Temporary / Disposable ---
+  "temp-mail.org", "temp-mail.io", "tempmail.com", "tempmail.net", "tempmail.org",
+  "10minutemail.com", "10minutemail.net", "10minutemail.org",
+  "guerrillamail.com", "guerrillamail.org", "guerrillamail.net", "guerrillamail.biz",
+  "guerrillamail.de", "guerrillamail.info", "guerrillamailblock.com",
+  "sharklasers.com", "grr.la", "spam4.me", "dispostable.com",
+  "getairmail.com", "moakt.com", "emailondeck.com", "throwam.com",
+  "mailnull.com", "spamgourmet.com", "trashmail.com", "trashmail.me",
+  "trashmail.net", "trashmail.at", "trashmail.io", "trashmail.org",
+  "mailnesia.com", "maildrop.cc", "discard.email", "spamherelots.com",
+  "spamhereplease.com", "spamthisplease.com", "binkmail.com", "bobmail.info",
+  "chammy.info", "devnullmail.com", "dugoutmail.com", "eyepaste.com",
+  "fakeinbox.com", "fastacura.com", "fastchevy.com", "fastchrysler.com",
+  "fastnissan.com", "fastsubaru.com", "fasttoyota.com", "fastzx2.com",
+  "filzmail.com", "gawab.com", "great-host.in", "hat-geld.de",
+  "herp.in", "ieatspam.eu", "ieatspam.info", "inoutmail.de",
+  "inoutmail.eu", "inoutmail.info", "inoutmail.net", "jetable.com",
+  "jetable.fr.nf", "jetable.net", "jetable.org", "keepmymail.com",
+  "klassmaster.com", "klassmaster.net", "klassmaster.org",
+  "letthemeatspam.com", "lol.ovpn.to", "lookugly.com", "lortemail.dk",
+  "m4il.biz", "mailbidon.com", "mailbiz.biz", "mailblocks.com",
+  "mailbucket.org", "mailc.net", "mailcat.biz", "mailcatch.com",
+  "maileater.com", "mailexpire.com", "mailfall.com", "mailfake.com",
+  "mailforspam.com", "mailfreeonline.com", "mailguard.me", "mailinblack.com",
+  "mailinator.com", "mailinator.net", "mailinator2.com",
+  "mailinspector.com", "mailme.ir", "mailme.lv", "mailme24.com",
+  "mailmetrash.com", "mailmoat.com", "mailnew.com", "mailnull.com",
+  "mailpick.biz", "mailproxsy.com", "mailquack.com", "mailrock.biz",
+  "mailscrap.com", "mailseal.de", "mailshell.com", "mailsiphon.com",
+  "mailslapping.com", "mailslite.com", "mailtemporaire.fr", "mailzilla.com",
+  "makemetheking.com", "manybrain.com", "mega.zik.dj", "meltmail.com",
+  "mierdamail.com", "migumail.com", "mintemail.com", "moncourrier.fr.nf",
+  "monemail.fr.nf", "monmail.fr.nf", "msa.minsmail.com", "mt2009.com",
+  "mt2014.com", "mytrashmail.com", "noclickemail.com", "nogmailspam.info",
+  "nospamfor.us", "nospammail.net", "nowmymail.net", "nus.edu.sg",
+  "objectmail.com", "obobbo.com", "oneoffemail.com", "oneoffmail.com",
+  "onewaymail.com", "onlatedotcom.info", "online.ms", "oopi.org",
+  "ordinaryamerican.net", "otherinbox.com", "ourklips.com",
+  "outlawspam.com", "ovpn.to", "owlpic.com", "pancakemail.com",
+  "pcusers.onmypc.net", "pepbot.com", "pimpedupmyspace.com",
+  "pjjkp.com", "plexolan.de", "pookmail.com", "privacy.net",
+  "proxymail.eu", "prtnx.com", "prtz.eu", "punkass.com",
+  "put2.net", "putthisinyourspamdatabase.com", "qq.com",
+  "quickinbox.com", "rcpt.at", "reallymymail.com", "recode.me",
+  "recursor.net", "regbypass.com", "regbypass.comsafe-mail.net",
+  "safetypost.de", "sandelf.de", "sast.ro", "saynotospams.com",
+  "selfdestructingmail.com", "sendspamhere.com", "sharedmailbox.org",
+  "shiftmail.com", "sibmail.com", "skeefmail.com", "slopsbox.com",
+  "smellfear.com", "snkmail.com", "sofimail.com", "sogetthis.com",
+  "soodonims.com", "spam.la", "spam.su", "spamavert.com",
+  "spambob.com", "spambob.net", "spambob.org", "spambog.com",
+  "spambog.de", "spambog.ru", "spambox.info", "spambox.irishspringrealty.com",
+  "spambox.us", "spamcannon.com", "spamcannon.net", "spamcero.com",
+  "spamcon.org", "spamcorptastic.com", "spamcowboy.com", "spamcowboy.net",
+  "spamcowboy.org", "spamday.com", "spamdecoy.net", "spamex.com",
+  "spamfree24.de", "spamfree24.eu", "spamfree24.info", "spamfree24.net",
+  "spamfree24.org", "spamgap.com", "spamgourmet.com", "spamgourmet.net",
+  "spamgourmet.org", "spamherelots.com", "spamhereplease.com",
+  "spamhole.com", "spamify.com", "spaminator.de", "spamkill.info",
+  "spaml.com", "spaml.de", "spammotel.com", "spammy.ml",
+  "spamnot.net", "spamoff.de", "spamslicer.com", "spamspot.com",
+  "spamstack.net", "spamthis.co.uk", "spamthisplease.com",
+  "spamtroll.net", "spamwc.de", "spamwc.net", "spamwc.org",
+  "spamwithus.com", "spaowy.com", "spitfire.li", "spoofmail.de",
+  "stuffmail.de", "super-auswahl.de", "supergreatmail.com",
+  "supermailer.jp", "superplatyna.com", "superrito.com",
+  "superstachel.de", "suremail.info", "svk.jp",
+  // --- Yopmail and variants ---
+  "yopmail.com", "yopmail.fr", "yopmail.net", "yopmail.pp.ua",
+  "cool.fr.nf", "jetable.fr.nf", "nospam.ze.tc", "nomail.xl.cx",
+  "mega.zik.dj", "speed.1s.fr", "courriel.fr.nf", "moncourrier.fr.nf",
+  "monemail.fr.nf", "monmail.fr.nf",
+  // --- MSN / Low quality Microsoft domains ---
+  "msn.com", "live.cn", "live.co.uk",
+  // --- Russian / CIS spam-prone ---
+  "mail.ru", "inbox.ru", "list.ru", "bk.ru",
+  // --- Other known spam providers ---
+  "throwaway.email", "fakemailgenerator.com", "getonemail.com",
+  "deadaddress.com", "throwam.com", "instantemailaddress.com",
+  "notmailinator.com", "nwldx.com",
 ];
 
-const WHITELIST_DOMAINS = [
-  "gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "icloud.com"
-];
+const isValidBookingEmail = (email: string): boolean => {
+  const domain = email.split("@")[1]?.toLowerCase();
+  if (!domain) return false;
+  // Block if in blocklist
+  if (BLOCKED_DOMAINS.includes(domain)) return false;
+  // Require domain to have a TLD of at least 2 chars and a proper structure
+  const parts = domain.split(".");
+  if (parts.length < 2) return false;
+  const tld = parts[parts.length - 1];
+  if (tld.length < 2) return false;
+  return true;
+};
 
 const contactSchema = z.object({
-  email: z.string().email().refine((email) => {
-    const domain = email.split("@")[1]?.toLowerCase();
-    return !DISPOSABLE_DOMAINS.includes(domain);
-  }, {
-    message: "Please use a professional or permanent personal email address to continue",
+  email: z.string().email().refine(isValidBookingEmail, {
+    message: "Por favor usa un correo profesional o permanente (Gmail, Hotmail, corporativo...)",
   }),
   message: z.string().min(10).max(500),
 });
@@ -40,9 +124,8 @@ export function ContactForm() {
     const parts = email.split("@");
     if (parts.length < 2) return; // Wait for full email
     
-    const domain = parts[1].toLowerCase();
-    if (DISPOSABLE_DOMAINS.includes(domain)) {
-      setEmailError("Please use a professional or permanent personal email address to continue");
+    if (!isValidBookingEmail(email)) {
+      setEmailError("Por favor usa un correo profesional o permanente (Gmail, Hotmail, corporativo...)");
     } else {
       setEmailError("");
     }
