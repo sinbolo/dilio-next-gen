@@ -16,7 +16,6 @@ const contactSchema = z.object({
 const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_DrFCN8sF_MNHDEUoK4voS4hTXdk3YCcXt';
 const LOGO_URL = "https://www.dilio.es/assets/logo_bio_off_clean.png";
 const DESTINATION_EMAIL = "booking@dilio.es";
-const ADMIN_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || "realdiliomusic@gmail.com";
 
 export async function POST(req: Request) {
   try {
@@ -52,7 +51,7 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
-        to: [DESTINATION_EMAIL, ADMIN_EMAIL],
+        to: DESTINATION_EMAIL,
         reply_to: validatedData.email,
         subject: `NEW BOOKING INQUIRY: ${validatedData.email}`,
         html: getBookingEmailHtml(LOGO_URL, validatedData),
@@ -69,35 +68,7 @@ export async function POST(req: Request) {
       throw new Error("Failed to send admin notification");
     }
 
-    // 2. Send Short Alert to Personal Gmail (mendezz)
-    const PERSONAL_ALERT_EMAIL = "mendezz1324@gmail.com";
-    const now = new Date();
-    const formattedDate = now.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const formattedTime = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'X-Idempotency-Key': `alert-${Date.now()}`
-      },
-      body: JSON.stringify({
-        from: FROM_EMAIL,
-        to: PERSONAL_ALERT_EMAIL,
-        subject: `[TEST ${formattedTime}] AVISO: Solicitud de Booking`,
-        html: `<p>Tienes una nueva solicitud de booking en dilio.es.</p>
-               <p><b>Fecha:</b> ${formattedDate}</p>
-               <p><b>Hora:</b> ${formattedTime}</p>
-               <p>Revisa el correo en <b>booking@dilio.es</b> para ver los detalles y responder.</p>`,
-        headers: {
-          'X-Auto-Response-Suppress': 'All',
-          'Auto-Submitted': 'auto-generated'
-        }
-      }),
-    });
-
-    // 3. Send professional confirmation to the Client
+    // 2. Send professional confirmation to the Client
     const clientRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
