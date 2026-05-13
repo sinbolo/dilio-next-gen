@@ -13,7 +13,7 @@ const contactSchema = z.object({
   message: z.string().min(10).max(500),
 });
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_DrFCN8sF_MNHDEUoK4voS4hTXdk3YCcXt';
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const LOGO_URL = "https://www.dilio.es/assets/logo_bio_off_clean.png";
 const DESTINATION_EMAIL = "booking@dilio.es";
 
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'X-Idempotency-Key': `admin-${validatedData.email}-${new Date().toISOString().split('T')[0]}`
+        'X-Idempotency-Key': `admin-${validatedData.email}-${new Date().toISOString().slice(0, 13)}`
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
@@ -74,12 +74,12 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'X-Idempotency-Key': `alert-${validatedData.email}-${new Date().toISOString().split('T')[0]}`
+        'X-Idempotency-Key': `alert-${validatedData.email}-${new Date().getTime()}`
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
         to: PERSONAL_ALERT_EMAIL,
-        subject: `AVISO: Solicitud de Booking - ${formattedDate}`,
+        subject: `[TEST ${formattedTime}] AVISO: Solicitud de Booking`,
         html: `<p>Tienes una nueva solicitud de booking en dilio.es.</p>
                <p><b>Fecha:</b> ${formattedDate}</p>
                <p><b>Hora:</b> ${formattedTime}</p>
@@ -97,7 +97,7 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'X-Idempotency-Key': `client-${validatedData.email}-${new Date().toISOString().split('T')[0]}`
+        'X-Idempotency-Key': `client-${validatedData.email}-${new Date().toISOString().slice(0, 13)}`
       },
       body: JSON.stringify({
         from: FROM_EMAIL,

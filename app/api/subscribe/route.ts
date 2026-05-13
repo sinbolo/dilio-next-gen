@@ -12,7 +12,7 @@ const subscribeSchema = z.object({
   email: z.string().email(),
 });
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_DrFCN8sF_MNHDEUoK4voS4hTXdk3YCcXt';
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const LOGO_URL = "https://www.dilio.es/assets/logo_bio_off_clean.png";
 const NOTIFY_ADMIN_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || "info@dilio.es";
 
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${RESEND_API_KEY}`,
-            'X-Idempotency-Key': `audience-${validatedData.email}-${new Date().toISOString().split('T')[0]}`
+            'X-Idempotency-Key': `audience-${validatedData.email}-${new Date().toISOString().slice(0, 13)}`
           },
           body: JSON.stringify({
             email: validatedData.email,
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'X-Idempotency-Key': `welcome-${validatedData.email}-${new Date().toISOString().split('T')[0]}`
+        'X-Idempotency-Key': `welcome-${validatedData.email}-${new Date().toISOString().slice(0, 13)}`
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
@@ -94,7 +94,7 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'X-Idempotency-Key': `admin-notify-${validatedData.email}-${new Date().toISOString().split('T')[0]}`
+        'X-Idempotency-Key': `admin-notify-${validatedData.email}-${new Date().getTime()}`
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
